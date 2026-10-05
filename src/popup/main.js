@@ -24,6 +24,8 @@
   globalThis.CircleMate.applyDialogStyle?.(document);
   const version=document.querySelector('.footer b');
   if(version&&chrome.runtime.getManifest)version.textContent=chrome.runtime.getManifest().version;
+  const projectVersion=document.getElementById("project-version");
+  if(projectVersion&&chrome.runtime.getManifest)projectVersion.textContent=`v${chrome.runtime.getManifest().version}`;
   const t = (key, values) => globalThis.CircleMate.i18n.text(language, key, values);
   const n = value => Number.isFinite(value) ? String(value) : t("unknown");
   const locale = () => language === "en" ? "en-US" : "zh-CN";
@@ -217,7 +219,7 @@
     }
     list.scrollTop=scrollTop;
   }
-  function renderAll() { renderAccount(); renderFollowBack(); el("member-total").textContent=String(currentGroup()?.users?.length || 0); renderStatus(); showView(selectedView); }
+  function renderAll() { renderAccount(); renderFollowBack(); renderStatus(); showView(selectedView); }
   async function callService(action, extra = {}) {
     if (busy) return;
     busy = true; notice = { key: "requesting" };

@@ -969,3 +969,12 @@ html[data-embedded=true] .app{
   color:inherit;
   font:600 11px system-ui}
 
+.project-info-head{display:flex;align-items:center;gap:10px}
+.project-info-head .summary-copy{flex:1}
+.project-version{font-size:10px;color:#657780;background:#f5f7f8;border:1px solid #dfe5e8;border-radius:8px;padding:4px 7px}
+.project-info-links{display:grid;gap:8px;margin-top:12px}
+.project-info-links a{display:flex;align-items:center;gap:8px;min-height:38px;padding:8px 10px;border:1px solid #dfe5e8;border-radius:10px;color:#163746;background:#f7f9fa;text-decoration:none;font-size:12px}
+.project-info-links a small{font-size:10px;color:#657780;overflow-wrap:anywhere}
+.project-external{margin-left:auto;color:#657780}
+.project-info-links a:hover{background:#edf4f1;border-color:#a9c8bb}
+.project-info-links a:focus-visible{outline:2px solid #168252;outline-offset:2px}
