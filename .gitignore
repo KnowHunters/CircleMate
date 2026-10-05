@@ -1,0 +1,13 @@
+node_modules/
+dist/
+*.zip
+*.tmp
+*.log
+.env
+.env.*
+Thumbs.db
+.DS_Store
+
+# Local browser captures may contain account information.
+docs/*.png
+docs/*.jpg

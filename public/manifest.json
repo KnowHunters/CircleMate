@@ -1,0 +1,59 @@
+{
+  "manifest_version": 3,
+  "name": "CircleMate",
+  "version": "0.5.15",
+  "description": "A local-first X relationship organizer for new users.",
+  "permissions": [
+    "storage",
+    "alarms",
+    "scripting",
+    "activeTab",
+    "cookies",
+    "webRequest"
+  ],
+  "host_permissions": [
+    "https://x.com/*",
+    "https://twitter.com/*",
+    "https://abs.twimg.com/*"
+  ],
+  "action": {
+    "default_title": "CircleMate",
+    "default_popup": "popup/index.html"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://x.com/*",
+        "https://twitter.com/*"
+      ],
+      "js": [
+        "shared/constants.js",
+        "shared/dialog-style.js",
+        "shared/native-page.js",
+        "shared/roster.js",
+        "content/content.js",
+        "content/roster-ui.js",
+        "content/panel.js"
+      ],
+      "run_at": "document_idle",
+      "all_frames": true,
+      "match_origin_as_fallback": true
+    }
+  ],
+  "background": {
+    "service_worker": "background/service-worker.js",
+    "type": "module"
+  },
+  "incognito": "not_allowed",
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "popup/index.html"
+      ],
+      "matches": [
+        "https://x.com/*",
+        "https://twitter.com/*"
+      ]
+    }
+  ]
+}

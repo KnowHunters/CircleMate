@@ -1,0 +1,668 @@
+{
+  "range": {
+    "from": 1790640000000,
+    "to": 1791244800000
+  },
+  "result": {
+    "current_time_series": [
+      {
+        "count": 6,
+        "engagement_type": "ProfilePic",
+        "is_engaging_user_verified": "true",
+        "timestamp": 1790640000000
+      },
+      {
+        "count": 2,
+        "engagement_type": "ProfilePic",
+        "is_engaging_user_verified": "false",
+        "timestamp": 1790640000000
+      },
+      {
+        "count": 1,
+        "engagement_type": "Reply",
+        "is_engaging_user_verified": "false",
+        "timestamp": 1790640000000
+      },
+      {
+        "count": 4,
+        "engagement_type": "Reply",
+        "is_engaging_user_verified": "true",
+        "timestamp": 1790640000000
+      },
+      {
+        "count": 3,
+        "engagement_type": "Fav",
+        "is_engaging_user_verified": "true",
+        "timestamp": 1790640000000
+      },
+      {
+        "count": 2,
+        "engagement_type": "Fav",
+        "is_engaging_user_verified": "false",
+        "timestamp": 1790640000000
+      },
+      {
+        "count": 1,
+        "engagement_type": "Unfav",
+        "is_engaging_user_verified": "false",
+        "timestamp": 1790640000000
+      },
+      {
+        "count": 1706,
+        "engagement_type": "Displayed",
+        "is_engaging_user_verified": "false",
+        "timestamp": 1790640000000
+      },
+      {
+        "count": 313,
+        "engagement_type": "Displayed",
+        "is_engaging_user_verified": "true",
+        "timestamp": 1790640000000
+      },
+      {
+        "count": 13,
+        "engagement_type": "Follow",
+        "is_engaging_user_verified": "true",
+        "timestamp": 1790640000000
+      },
+      {
+        "count": 1,
+        "engagement_type": "Unfollow",
+        "is_engaging_user_verified": "true",
+        "timestamp": 1790640000000
+      },
+      {
+        "count": 1,
+        "engagement_type": "Bookmark",
+        "is_engaging_user_verified": "false",
+        "timestamp": 1790640000000
+      },
+      {
+        "count": 6,
+        "engagement_type": "ReplyCreate",
+        "is_engaging_user_verified": "true",
+        "timestamp": 1790640000000
+      },
+      {
+        "count": 3,
+        "engagement_type": "HomeLinger",
+        "is_engaging_user_verified": "true",
+        "timestamp": 1790640000000
+      },
+      {
+        "count": 1,
+        "engagement_type": "HomeLinger",
+        "is_engaging_user_verified": "false",
+        "timestamp": 1790640000000
+      },
+      {
+        "count": 2,
+        "engagement_type": "ProfilePic",
+        "is_engaging_user_verified": "false",
+        "timestamp": 1790726400000
+      },
+      {
+        "count": 1,
+        "engagement_type": "ProfilePic",
+        "is_engaging_user_verified": "true",
+        "timestamp": 1790726400000
+      },
+      {
+        "count": 2,
+        "engagement_type": "Fav",
+        "is_engaging_user_verified": "false",
+        "timestamp": 1790726400000
+      },
+      {
+        "count": 1,
+        "engagement_type": "Fav",
+        "is_engaging_user_verified": "true",
+        "timestamp": 1790726400000
+      },
+      {
+        "count": 2366,
+        "engagement_type": "Displayed",
+        "is_engaging_user_verified": "false",
+        "timestamp": 1790726400000
+      },
+      {
+        "count": 262,
+        "engagement_type": "Displayed",
+        "is_engaging_user_verified": "true",
+        "timestamp": 1790726400000
+      },
+      {
+        "count": 1,
+        "engagement_type": "Follow",
+        "is_engaging_user_verified": "false",
+        "timestamp": 1790726400000
+      },
+      {
+        "count": 6,
+        "engagement_type": "Follow",
+        "is_engaging_user_verified": "true",
+        "timestamp": 1790726400000
+      },
+      {
+        "count": 1,
+        "engagement_type": "Unfollow",
+        "is_engaging_user_verified": "true",
+        "timestamp": 1790726400000
+      },
+      {
+        "count": 4,
+        "engagement_type": "ReplyCreate",
+        "is_engaging_user_verified": "true",
+        "timestamp": 1790726400000
+      },
+      {
+        "count": 2,
+        "engagement_type": "ProfilePic",
+        "is_engaging_user_verified": "false",
+        "timestamp": 1790812800000
+      },
+      {
+        "count": 11,
+        "engagement_type": "ProfilePic",
+        "is_engaging_user_verified": "true",
+        "timestamp": 1790812800000
+      },
+      {
+        "count": 1,
+        "engagement_type": "Retweet",
+        "is_engaging_user_verified": "true",
+        "timestamp": 1790812800000
+      },
+      {
+        "count": 9,
+        "engagement_type": "Reply",
+        "is_engaging_user_verified": "true",
+        "timestamp": 1790812800000
+      },
+      {
+        "count": 15,
+        "engagement_type": "Fav",
+        "is_engaging_user_verified": "true",
+        "timestamp": 1790812800000
+      },
+      {
+        "count": 5,
+        "engagement_type": "Fav",
+        "is_engaging_user_verified": "false",
+        "timestamp": 1790812800000
+      },
+      {
+        "count": 627,
+        "engagement_type": "Displayed",
+        "is_engaging_user_verified": "true",
+        "timestamp": 1790812800000
+      },
+      {
+        "count": 1949,
+        "engagement_type": "Displayed",
+        "is_engaging_user_verified": "false",
+        "timestamp": 1790812800000
+      },
+      {
+        "count": 186,
+        "engagement_type": "Follow",
+        "is_engaging_user_verified": "true",
+        "timestamp": 1790812800000
+      },
+      {
+        "count": 27,
+        "engagement_type": "Follow",
+        "is_engaging_user_verified": "false",
+        "timestamp": 1790812800000
+      },
+      {
+        "count": 2,
+        "engagement_type": "Unfollow",
+        "is_engaging_user_verified": "false",
+        "timestamp": 1790812800000
+      },
+      {
+        "count": 1,
+        "engagement_type": "Unfollow",
+        "is_engaging_user_verified": "true",
+        "timestamp": 1790812800000
+      },
+      {
+        "count": 1,
+        "engagement_type": "Unretweet",
+        "is_engaging_user_verified": "true",
+        "timestamp": 1790812800000
+      },
+      {
+        "count": 1,
+        "engagement_type": "QuoteTweet",
+        "is_engaging_user_verified": "true",
+        "timestamp": 1790812800000
+      },
+      {
+        "count": 9,
+        "engagement_type": "ReplyCreate",
+        "is_engaging_user_verified": "true",
+        "timestamp": 1790812800000
+      },
+      {
+        "count": 5,
+        "engagement_type": "HomeLinger",
+        "is_engaging_user_verified": "true",
+        "timestamp": 1790812800000
+      },
+      {
+        "count": 3,
+        "engagement_type": "ProfilePic",
+        "is_engaging_user_verified": "true",
+        "timestamp": 1790899200000
+      },
+      {
+        "count": 4,
+        "engagement_type": "ProfilePic",
+        "is_engaging_user_verified": "false",
+        "timestamp": 1790899200000
+      },
+      {
+        "count": 3,
+        "engagement_type": "Reply",
+        "is_engaging_user_verified": "true",
+        "timestamp": 1790899200000
+      },
+      {
+        "count": 10,
+        "engagement_type": "Fav",
+        "is_engaging_user_verified": "true",
+        "timestamp": 1790899200000
+      },
+      {
+        "count": 377,
+        "engagement_type": "Displayed",
+        "is_engaging_user_verified": "true",
+        "timestamp": 1790899200000
+      },
+      {
+        "count": 1513,
+        "engagement_type": "Displayed",
+        "is_engaging_user_verified": "false",
+        "timestamp": 1790899200000
+      },
+      {
+        "count": 8,
+        "engagement_type": "Follow",
+        "is_engaging_user_verified": "false",
+        "timestamp": 1790899200000
+      },
+      {
+        "count": 58,
+        "engagement_type": "Follow",
+        "is_engaging_user_verified": "true",
+        "timestamp": 1790899200000
+      },
+      {
+        "count": 4,
+        "engagement_type": "Unfollow",
+        "is_engaging_user_verified": "true",
+        "timestamp": 1790899200000
+      },
+      {
+        "count": 2,
+        "engagement_type": "TweetCreate",
+        "is_engaging_user_verified": "true",
+        "timestamp": 1790899200000
+      },
+      {
+        "count": 3,
+        "engagement_type": "ReplyCreate",
+        "is_engaging_user_verified": "true",
+        "timestamp": 1790899200000
+      },
+      {
+        "count": 12,
+        "engagement_type": "HomeLinger",
+        "is_engaging_user_verified": "true",
+        "timestamp": 1790899200000
+      },
+      {
+        "count": 53,
+        "engagement_type": "HomeLinger",
+        "is_engaging_user_verified": "false",
+        "timestamp": 1790899200000
+      },
+      {
+        "count": 2,
+        "engagement_type": "ProfilePic",
+        "is_engaging_user_verified": "false",
+        "timestamp": 1790985600000
+      },
+      {
+        "count": 2,
+        "engagement_type": "Reply",
+        "is_engaging_user_verified": "true",
+        "timestamp": 1790985600000
+      },
+      {
+        "count": 1,
+        "engagement_type": "Fav",
+        "is_engaging_user_verified": "false",
+        "timestamp": 1790985600000
+      },
+      {
+        "count": 3,
+        "engagement_type": "Fav",
+        "is_engaging_user_verified": "true",
+        "timestamp": 1790985600000
+      },
+      {
+        "count": 3097,
+        "engagement_type": "Displayed",
+        "is_engaging_user_verified": "false",
+        "timestamp": 1790985600000
+      },
+      {
+        "count": 322,
+        "engagement_type": "Displayed",
+        "is_engaging_user_verified": "true",
+        "timestamp": 1790985600000
+      },
+      {
+        "count": 3,
+        "engagement_type": "Follow",
+        "is_engaging_user_verified": "false",
+        "timestamp": 1790985600000
+      },
+      {
+        "count": 34,
+        "engagement_type": "Follow",
+        "is_engaging_user_verified": "true",
+        "timestamp": 1790985600000
+      },
+      {
+        "count": 3,
+        "engagement_type": "Unfollow",
+        "is_engaging_user_verified": "true",
+        "timestamp": 1790985600000
+      },
+      {
+        "count": 1,
+        "engagement_type": "TweetCreate",
+        "is_engaging_user_verified": "true",
+        "timestamp": 1790985600000
+      },
+      {
+        "count": 3,
+        "engagement_type": "ReplyCreate",
+        "is_engaging_user_verified": "true",
+        "timestamp": 1790985600000
+      },
+      {
+        "count": 6,
+        "engagement_type": "HomeLinger",
+        "is_engaging_user_verified": "true",
+        "timestamp": 1790985600000
+      },
+      {
+        "count": 1,
+        "engagement_type": "HomeLinger",
+        "is_engaging_user_verified": "false",
+        "timestamp": 1790985600000
+      }
+    ],
+    "previous_totals": [
+      {
+        "count": 1,
+        "engagement_type": "ProfilePic",
+        "is_engaging_user_verified": "true",
+        "timestamp": 1790035200000
+      },
+      {
+        "count": 3,
+        "engagement_type": "ProfilePic",
+        "is_engaging_user_verified": "false",
+        "timestamp": 1790035200000
+      },
+      {
+        "count": 1,
+        "engagement_type": "Reply",
+        "is_engaging_user_verified": "true",
+        "timestamp": 1790035200000
+      },
+      {
+        "count": 1,
+        "engagement_type": "Fav",
+        "is_engaging_user_verified": "true",
+        "timestamp": 1790035200000
+      },
+      {
+        "count": 1,
+        "engagement_type": "Fav",
+        "is_engaging_user_verified": "false",
+        "timestamp": 1790035200000
+      },
+      {
+        "count": 130,
+        "engagement_type": "Displayed",
+        "is_engaging_user_verified": "true",
+        "timestamp": 1790035200000
+      },
+      {
+        "count": 814,
+        "engagement_type": "Displayed",
+        "is_engaging_user_verified": "false",
+        "timestamp": 1790035200000
+      },
+      {
+        "count": 2,
+        "engagement_type": "Follow",
+        "is_engaging_user_verified": "true",
+        "timestamp": 1790035200000
+      },
+      {
+        "count": 2,
+        "engagement_type": "Follow",
+        "is_engaging_user_verified": "false",
+        "timestamp": 1790035200000
+      },
+      {
+        "count": 1,
+        "engagement_type": "Unfollow",
+        "is_engaging_user_verified": "false",
+        "timestamp": 1790035200000
+      },
+      {
+        "count": 1,
+        "engagement_type": "Unfollow",
+        "is_engaging_user_verified": "true",
+        "timestamp": 1790035200000
+      },
+      {
+        "count": 1,
+        "engagement_type": "Bookmark",
+        "is_engaging_user_verified": "false",
+        "timestamp": 1790035200000
+      },
+      {
+        "count": 1,
+        "engagement_type": "TweetCreate",
+        "is_engaging_user_verified": "true",
+        "timestamp": 1790035200000
+      },
+      {
+        "count": 3,
+        "engagement_type": "ReplyCreate",
+        "is_engaging_user_verified": "true",
+        "timestamp": 1790035200000
+      },
+      {
+        "count": 9,
+        "engagement_type": "HomeLinger",
+        "is_engaging_user_verified": "false",
+        "timestamp": 1790035200000
+      }
+    ],
+    "legacy_current_follow_metrics": [
+      {
+        "metric_values": [
+          {
+            "metric_type": "Follows",
+            "metric_value": 10
+          },
+          {
+            "metric_type": "Unfollows",
+            "metric_value": 1
+          }
+        ],
+        "timestamp": {
+          "iso8601_time": "2026-09-29T00:00:00Z"
+        }
+      },
+      {
+        "metric_values": [
+          {
+            "metric_type": "Follows",
+            "metric_value": 7
+          },
+          {
+            "metric_type": "Unfollows",
+            "metric_value": 1
+          }
+        ],
+        "timestamp": {
+          "iso8601_time": "2026-09-30T00:00:00Z"
+        }
+      },
+      {
+        "metric_values": [
+          {
+            "metric_type": "Follows",
+            "metric_value": 208
+          },
+          {
+            "metric_type": "Unfollows",
+            "metric_value": 3
+          }
+        ],
+        "timestamp": {
+          "iso8601_time": "2026-10-01T00:00:00Z"
+        }
+      },
+      {
+        "metric_values": [
+          {
+            "metric_type": "Follows",
+            "metric_value": 65
+          },
+          {
+            "metric_type": "Unfollows",
+            "metric_value": 4
+          }
+        ],
+        "timestamp": {
+          "iso8601_time": "2026-10-02T00:00:00Z"
+        }
+      },
+      {
+        "metric_values": [
+          {
+            "metric_type": "Follows",
+            "metric_value": 37
+          },
+          {
+            "metric_type": "Unfollows",
+            "metric_value": 3
+          }
+        ],
+        "timestamp": {
+          "iso8601_time": "2026-10-03T00:00:00Z"
+        }
+      },
+      {
+        "metric_values": [
+          {
+            "metric_type": "Follows",
+            "metric_value": 69
+          },
+          {
+            "metric_type": "Unfollows",
+            "metric_value": 4
+          }
+        ],
+        "timestamp": {
+          "iso8601_time": "2026-10-04T00:00:00Z"
+        }
+      },
+      {
+        "metric_values": [
+          {
+            "metric_type": "Follows",
+            "metric_value": 3
+          },
+          {
+            "metric_type": "Unfollows"
+          }
+        ],
+        "timestamp": {
+          "iso8601_time": "2026-10-05T00:00:00Z"
+        }
+      }
+    ],
+    "legacy_previous_follow_metrics": [
+      {
+        "metric_values": [
+          {
+            "metric_type": "Follows",
+            "metric_value": 1
+          },
+          {
+            "metric_type": "Unfollows"
+          }
+        ],
+        "timestamp": {
+          "iso8601_time": "2026-09-22T00:00:00Z"
+        }
+      },
+      {
+        "metric_values": [
+          {
+            "metric_type": "Follows"
+          },
+          {
+            "metric_type": "Unfollows",
+            "metric_value": 1
+          }
+        ],
+        "timestamp": {
+          "iso8601_time": "2026-09-23T00:00:00Z"
+        }
+      },
+      {
+        "metric_values": [
+          {
+            "metric_type": "Follows",
+            "metric_value": 3
+          },
+          {
+            "metric_type": "Unfollows"
+          }
+        ],
+        "timestamp": {
+          "iso8601_time": "2026-09-26T00:00:00Z"
+        }
+      },
+      {
+        "metric_values": [
+          {
+            "metric_type": "Follows"
+          },
+          {
+            "metric_type": "Unfollows",
+            "metric_value": 1
+          }
+        ],
+        "timestamp": {
+          "iso8601_time": "2026-09-28T00:00:00Z"
+        }
+      }
+    ]
+  }
+}

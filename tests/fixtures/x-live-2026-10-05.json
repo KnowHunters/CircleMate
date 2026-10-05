@@ -1,0 +1,36 @@
+{
+  "evidence": "Native Chrome HTTP 200. Selected response fields only; user identity replaced. Counts and timestamps unchanged. This is a partial fixture, not a complete analytics period.",
+  "verifiedUser": {"__typename":"User","rest_id":"2","core":{"name":"Fixture user","screen_name":"fixture_user"},"relationship_perspectives":{"blocked_by":false,"blocking":false,"followed_by":true,"following":true,"live_following":false,"muting":false},"follow_request_sent":false,"is_blue_verified":true},
+  "analytics": {
+    "current_time_series": [
+      {"count":3,"engagement_type":"ProfilePic","is_engaging_user_verified":"false","timestamp":1790553600000},
+      {"count":1,"engagement_type":"ProfilePic","is_engaging_user_verified":"true","timestamp":1790553600000},
+      {"count":1,"engagement_type":"Reply","is_engaging_user_verified":"true","timestamp":1790553600000},
+      {"count":1,"engagement_type":"Fav","is_engaging_user_verified":"true","timestamp":1790553600000},
+      {"count":69,"engagement_type":"Displayed","is_engaging_user_verified":"true","timestamp":1790553600000},
+      {"count":504,"engagement_type":"Displayed","is_engaging_user_verified":"false","timestamp":1790553600000},
+      {"count":1,"engagement_type":"Unfollow","is_engaging_user_verified":"true","timestamp":1790553600000},
+      {"count":1,"engagement_type":"Bookmark","is_engaging_user_verified":"false","timestamp":1790553600000}
+    ],
+    "previous_totals": [
+      {"count":1,"engagement_type":"ProfilePic","is_engaging_user_verified":"true","timestamp":1789948800000},
+      {"count":1,"engagement_type":"Fav","is_engaging_user_verified":"false","timestamp":1789948800000},
+      {"count":82,"engagement_type":"Displayed","is_engaging_user_verified":"true","timestamp":1789948800000},
+      {"count":426,"engagement_type":"Displayed","is_engaging_user_verified":"false","timestamp":1789948800000},
+      {"count":2,"engagement_type":"Follow","is_engaging_user_verified":"false","timestamp":1789948800000},
+      {"count":3,"engagement_type":"Follow","is_engaging_user_verified":"true","timestamp":1789948800000},
+      {"count":1,"engagement_type":"Unfollow","is_engaging_user_verified":"false","timestamp":1789948800000},
+      {"count":2,"engagement_type":"TweetCreate","is_engaging_user_verified":"true","timestamp":1789948800000},
+      {"count":2,"engagement_type":"ReplyCreate","is_engaging_user_verified":"true","timestamp":1789948800000},
+      {"count":2,"engagement_type":"HomeLinger","is_engaging_user_verified":"true","timestamp":1789948800000},
+      {"count":9,"engagement_type":"HomeLinger","is_engaging_user_verified":"false","timestamp":1789948800000}
+    ],
+    "legacy_current_follow_metrics": [
+      {"metric_values":[{"metric_type":"Follows"},{"metric_type":"Unfollows","metric_value":1}],"timestamp":{"iso8601_time":"2026-09-28T00:00:00Z"}},
+      {"metric_values":[{"metric_type":"Follows","metric_value":10},{"metric_type":"Unfollows","metric_value":1}],"timestamp":{"iso8601_time":"2026-09-29T00:00:00Z"}},
+      {"metric_values":[{"metric_type":"Follows","metric_value":7},{"metric_type":"Unfollows","metric_value":1}],"timestamp":{"iso8601_time":"2026-09-30T00:00:00Z"}}
+    ],
+    "realtime_active_followers":{"active_count":476,"is_approximate":false},"verified_follower_count":"458"
+  },
+  "frozen":{"__typename":"UserUnavailable","message":"User is suspended","reason":"Suspended"}
+}
