@@ -136,3 +136,6 @@ friendships/create 是现有候选写接口，本次没有发起关注动作，�
 
 随后原生资料请求 UserByScreenName 返回 HTTP 200，relationship_perspectives.following=false；页面显示“关注”。重新关注后刷新资料，同字段为 true，页面显示“正在关注”。因此 destroy 响应的 following 不能独立用来判定失败，插件在未获得 false 时读取目标资料核验，不重发写请求。凭据未写入证据文件。
 
+# 群资料卡互动研究（2026-10-06）
+
+最近帖子读取、群页面保留、原生点赞/取消点赞与回复编辑器的证据见 [研究记录](profile-card-interactions-research-2026-10-06.md)，完整脱敏请求配置见 [抓包参数](profile-card-interactions-probe-2026-10-06.json)。回复发送未测试，不将其列为已核验写接口。
