@@ -98,7 +98,7 @@ export function projectAccount(state) {
   return { schemaVersion: SCHEMA_VERSION, accountId: state.accountId, account: state.account,
     groups: Object.values(state.groups).sort((a,b) => b.lastSeen - a.lastSeen).map(g => ({ ...g, retryAt: Math.max(g.retryAt || 0,state.profileRetryAt || 0), users: groupUsers(state, g, context) })),
     relationships, followBack: followBackUsers(state,context), relationshipChanges: Object.fromEntries(Object.entries(state.lists).filter(([, list]) => !list.stale).map(([kind, list]) => [kind, list.changes])),
-    creator: state.creator, analytics: state.analytics || null, autoSync: state.autoSync || null, nativePage: state.nativePage || null, tasks: state.tasks,
+    creatorLibrary:state.creatorLibrary || {posts:[]}, creator: state.creator, analytics: state.analytics || null, autoSync: state.autoSync || null, nativePage: state.nativePage || null, tasks: state.tasks,
     revision:state.revision||0,capabilities: state.capabilities || {unfollow:false},writeQueue: state.writeQueue || { jobs: [], paused: false, nextAt: 0 }, updatedAt: state.updatedAt };
 }
 export function followBackUsers(state,context=relationContext(state)){

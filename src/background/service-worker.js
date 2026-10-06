@@ -128,7 +128,8 @@ chrome.runtime.onMessage.addListener((message, sender, respond) => {
   if(rosterAction && sender.id === chrome.runtime.id && sender.tab) message={...message,action:rosterAction};
   if(['FOLLOW','RECHECK_MEMBER'].includes(message?.action))message={...message,fromFollowers:false};
   if ((!Object.hasOwn(services, message?.action || "") && !['QUEUE_CONTROL','EXPORT_BACKUP','RESTORE_BACKUP'].includes(message?.action)) || sender.id !== chrome.runtime.id) return false;
-  if (sender.tab && !rosterInline && !["ROSTER", "ROSTER_REFERENCES",'QUEUE_CONTROL'].includes(message.action)) return false;
+  if(message.action==='CREATOR_LIBRARY'&&sender.tab&&(sender.frameId!==0||!/^https:\/\/(x\.com|twitter\.com)\//.test(sender.url||'')))return false;
+  if (sender.tab && !rosterInline && !["ROSTER", "ROSTER_REFERENCES",'QUEUE_CONTROL','CREATOR_LIBRARY'].includes(message.action)) return false;
   if (!sender.tab && ["ROSTER", "ROSTER_REFERENCES"].includes(message.action)) return false;
   const run = async () => {
     let s;
@@ -138,7 +139,7 @@ chrome.runtime.onMessage.addListener((message, sender, respond) => {
         if (!context?.groupId || context.groupId !== message.groupId) throw new Error("群聊已切换，请重新打开插件");
         if ((message.action === "ROSTER_REFERENCES" || message.action === 'ENRICH_GROUP') && !context.isInfo) throw new Error("成员采集仅限群信息页");
       }
-      s = await sessions.get(sender.tab?.id ?? message.tabId, !["ROSTER", "ROSTER_REFERENCES", "GET_STATE"].includes(message.action));
+      s = await sessions.get(sender.tab?.id ?? message.tabId, !["ROSTER", "ROSTER_REFERENCES", "GET_STATE",'CREATOR_LIBRARY'].includes(message.action));
       if(message.accountId&&message.accountId!==s.accountId)throw new Error('账号已切换，已取消此操作');
       let state = await repository.load(s.accountId);
       if(message.action==='EXPORT_BACKUP'){respond({ok:true,backup:state});return;}

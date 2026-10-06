@@ -1,3 +1,4 @@
+import {validateCreatorLibrary} from './creator-library.js';
 export const CURRENT_SCHEMA = 4;
 export function migrateAccount(input, accountId) {
   if(!input || input.accountId!==accountId)throw new Error('缓存账号不匹配，未覆盖本地数据');
@@ -15,6 +16,7 @@ export function migrateAccount(input, accountId) {
 export function validateBackup(input, accountId) {
   if(!input||JSON.stringify(input).length>8*1024*1024)throw new Error('备份文件无效或超过 8 MB');
   const state=migrateAccount(input,accountId);
+  validateCreatorLibrary(state.creatorLibrary);
   delete state.capabilities; // Runtime evidence is never supplied by an imported backup.
   if(!state.users||Array.isArray(state.users)||!state.groups||Array.isArray(state.groups))throw new Error('备份结构不完整');
   for(const [id,user]of Object.entries(state.users))if(!/^\d{1,30}$/.test(id)||user?.id!==id||!/^[a-z0-9_]{1,15}$/i.test(user.username||''))throw new Error('备份成员格式无效');
