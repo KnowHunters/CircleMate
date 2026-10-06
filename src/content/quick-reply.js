@@ -9,7 +9,7 @@
     return Boolean(match && !excluded.has(match[1].toLowerCase()));
   };
   const style = document.createElement('style');
-  style.textContent = '.cm-quick-reply{display:inline-flex;align-items:center;justify-content:center;flex:0 0 28px;width:28px;height:28px;margin:0 0 0 4px;padding:0;border:0;border-radius:50%;background:transparent;color:#1d9bf0;cursor:pointer}.cm-quick-reply:hover{background:rgba(29,155,240,.12)}.cm-quick-reply:focus-visible{outline:2px solid #1d9bf0;outline-offset:2px}.cm-quick-reply:disabled{opacity:.4;cursor:default}.cm-quick-reply svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}';
+  style.textContent = '.cm-quick-reply{flex:0 0 auto;margin:0;cursor:pointer}.cm-quick-reply:hover{color:rgb(29,155,240)!important}.cm-quick-reply:hover>div{background:rgba(29,155,240,.1);border-radius:50%}.cm-quick-reply:focus-visible{outline:2px solid rgb(29,155,240);outline-offset:2px}.cm-quick-reply:disabled{opacity:.4;cursor:default}.cm-quick-reply svg{fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}';
   document.head.append(style);
   function update(article) {
     const existing = article.querySelector('.cm-quick-reply');
@@ -19,11 +19,19 @@
       existing?.remove(); return;
     }
     if (existing) { if (existing.disabled !== reply.disabled) existing.disabled = reply.disabled; return; }
-    const button = document.createElement('button');
-    button.type = 'button'; button.className = 'cm-quick-reply';
+    const nativeIcon = reply.querySelector('svg');
+    if (!nativeIcon) return;
+    const button = reply.cloneNode(false);
+    button.removeAttribute('data-testid'); button.removeAttribute('id');
+    button.type = 'button'; button.classList.add('cm-quick-reply');
     const label = document.documentElement.lang.startsWith('zh') ? '快速回复' : 'Quick reply';
     button.title = label; button.setAttribute('aria-label', label); button.disabled = reply.disabled;
-    button.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 5H5a2 2 0 0 0-2 2v11l4-3h8a2 2 0 0 0 2-2v-1M13 9l7-7 2 2-7 7-3 1z"/></svg>';
+    // Reuse the native icon container and sizing classes for X themes and density.
+    const iconContainer = nativeIcon.parentElement.cloneNode(true);
+    const icon = iconContainer.querySelector('svg');
+    icon.setAttribute('viewBox', '0 0 24 24'); icon.setAttribute('aria-hidden', 'true');
+    icon.innerHTML = '<path d="M14 5H5a2 2 0 0 0-2 2v11l4-3h8a2 2 0 0 0 2-2v-1M13 9l7-7 2 2-7 7-3 1z"/>';
+    button.append(iconContainer);
     button.addEventListener('click', event => {
       event.preventDefault(); event.stopPropagation();
       if (!event.isTrusted || !isProfile()) return;
