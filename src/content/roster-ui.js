@@ -13,11 +13,11 @@
   }
   function notify(text,failed=false){feedback={text,failed,until:Date.now()+10000};render();}
   const send=(action,extra={})=>chrome.runtime.sendMessage({action,groupId,...extra});
-  function confirmUnfollow(root,username){
+  function confirmUnfollow(root,displayName){
     return new Promise(resolve=>{
       api.applyDialogStyle?.(root);
       const dialog=document.createElement('dialog');dialog.className='cm-confirm-dialog';
-      const title=document.createElement('h3');title.textContent='取关 @'+username+'？';
+      const title=document.createElement('h3');title.textContent='取关「'+displayName+'」？';
       const text=document.createElement('p');text.textContent='确认后将取消关注此账号。';
       const actions=document.createElement('div');actions.className='cm-confirm-actions';
       const finish=value=>{dialog.close();dialog.remove();resolve(value);};
@@ -104,7 +104,8 @@
             if(!state.capabilities?.unfollow){window.open('https://x.com/'+username,'_blank','noopener,noreferrer');return;}
             const originGroup=groupId,originAccount=state?.accountId;
             button.disabled=true;pendingFollows.add(username);
-            if(!await confirmUnfollow(root,username)){pendingFollows.delete(username);render();return;}
+            const displayName=row.querySelector('a[href]')?.textContent?.trim() || user?.displayName || '此用户';
+            if(!await confirmUnfollow(root,displayName)){pendingFollows.delete(username);render();return;}
             button.textContent='取关中…';
             try{const result=await chrome.runtime.sendMessage({action:'ROSTER_UNFOLLOW',groupId:originGroup,accountId:originAccount,userId:user.id,username});
               if(groupId!==originGroup||state?.accountId!==originAccount)return;
