@@ -1,0 +1,166 @@
+{
+  "data": {
+    "create_tweet": {
+      "tweet_results": {
+        "result": {
+          "cashtag_attachments": [],
+          "core": {
+            "user_results": {
+              "result": {
+                "__typename": "User",
+                "action_counts": {
+                  "favorites_count": 1
+                },
+                "affiliates_highlighted_label": {},
+                "avatar": {
+                  "image_url": "https://pbs.twimg.com/profile_images/2091800908317503488/Wg5N67K2_normal.jpg"
+                },
+                "banner": {
+                  "image_url": "https://pbs.twimg.com/profile_banners/1638101918869524482/1791253593"
+                },
+                "core": {
+                  "created_at": "Tue Mar 21 08:55:23 +0000 2023",
+                  "name": "教下我&叫下我",
+                  "screen_name": "jiaoxiawo"
+                },
+                "follow_request_sent": false,
+                "has_graduated_access": true,
+                "id": "VXNlcjoxNjM4MTAxOTE4ODY5NTI0NDgy",
+                "is_blue_verified": true,
+                "location": {
+                  "location": ""
+                },
+                "media_permissions": {
+                  "can_media_tag": true
+                },
+                "notifications_settings": {
+                  "notifications_enabled": false
+                },
+                "parody_commentary_fan_label": "None",
+                "pinned_items": {},
+                "possibly_sensitive": false,
+                "privacy": {
+                  "protected": false
+                },
+                "profile_bio": {
+                  "description": "为什么叫这个名？因为买了域名 'https://t.co/AuFcl31R6E'\n\n「教下我」= 我把踩过的坑、用过的方法讲给你听  \n「叫下我」= 账号、工具、优惠有需要就直接找我\n\n新手上路，多多指教。",
+                  "entities": {
+                    "description": {
+                      "urls": [
+                        {
+                          "display_url": "jiaoxiawo.com",
+                          "expanded_url": "http://jiaoxiawo.com",
+                          "indices": [
+                            16,
+                            39
+                          ],
+                          "url": "https://t.co/AuFcl31R6E"
+                        }
+                      ]
+                    }
+                  }
+                },
+                "profile_description_language": "zh",
+                "profile_image_shape": "Circle",
+                "profile_metadata": {
+                  "profile_interstitial_type": ""
+                },
+                "profile_translation": {
+                  "translator_type": "none"
+                },
+                "relationship_counts": {
+                  "followers": 5,
+                  "following": 22
+                },
+                "relationship_perspectives": {
+                  "blocked_by": false,
+                  "blocking": false,
+                  "followed_by": false,
+                  "following": false,
+                  "live_following": false,
+                  "muting": false
+                },
+                "rest_id": "1638101918869524482",
+                "super_follow_eligible": false,
+                "super_followed_by": false,
+                "super_following": false,
+                "tweet_counts": {
+                  "media_tweets": 2,
+                  "tweets": 5
+                },
+                "verification": {
+                  "verified": false
+                },
+                "verified_user_profiles": {
+                  "super_follows_user_profile": {
+                    "is_active": false
+                  }
+                },
+                "website": {
+                  "url": ""
+                }
+              }
+            }
+          },
+          "edit_control": {
+            "edit_tweet_ids": [
+              "2107695618135376114"
+            ],
+            "editable_until_msecs": "1791352369000",
+            "edits_remaining": "5",
+            "is_edit_eligible": false
+          },
+          "grok_analysis_button": true,
+          "grok_annotations": {},
+          "grok_translated_post_with_availability": {
+            "is_available": false
+          },
+          "is_translatable": false,
+          "legacy": {
+            "bookmark_count": 0,
+            "bookmarked": false,
+            "conversation_id_str": "2106224569686368292",
+            "created_at": "Wed Oct 07 04:52:49 +0000 2026",
+            "display_text_range": [
+              13,
+              39
+            ],
+            "entities": {
+              "user_mentions": [
+                {
+                  "id_str": "580706651",
+                  "indices": [
+                    0,
+                    12
+                  ],
+                  "name": "知识猎人",
+                  "screen_name": "knowhunters"
+                }
+              ]
+            },
+            "favorite_count": 0,
+            "favorited": false,
+            "full_text": "@knowhunters CircleMate 内嵌回复功能测试，测试后删除。",
+            "id_str": "2107695618135376114",
+            "in_reply_to_screen_name": "knowhunters",
+            "in_reply_to_status_id_str": "2106224569686368292",
+            "in_reply_to_user_id_str": "580706651",
+            "is_quote_status": false,
+            "lang": "zh",
+            "quote_count": 0,
+            "reply_count": 0,
+            "retweet_count": 0,
+            "retweeted": false,
+            "user_id_str": "1638101918869524482"
+          },
+          "rest_id": "2107695618135376114",
+          "unmention_data": {},
+          "unmention_info": {},
+          "views": {
+            "state": "Enabled"
+          }
+        }
+      }
+    }
+  }
+}

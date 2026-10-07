@@ -17,6 +17,8 @@ export function validateBackup(input, accountId) {
   if(!input||JSON.stringify(input).length>8*1024*1024)throw new Error('备份文件无效或超过 8 MB');
   const state=migrateAccount(input,accountId);
   validateCreatorLibrary(state.creatorLibrary);
+  if(state.replyIntents && (typeof state.replyIntents!=='object'||Array.isArray(state.replyIntents)||Object.keys(state.replyIntents).length>100))throw new Error('备份回复操作格式无效');
+  for(const [id,intent]of Object.entries(state.replyIntents||{}))if(!/^\d{1,30}$/.test(id)||!/^[a-z0-9_-]{10,80}$/i.test(intent?.token||'')||!['running','complete'].includes(intent.status)||!Number.isFinite(intent.at)||(intent.status==='complete'&&!/^\d{1,30}$/.test(intent.replyId||'')))throw new Error('备份回复操作格式无效');
   if(state.postLikeIntents && (Array.isArray(state.postLikeIntents)||Object.keys(state.postLikeIntents).length>100))throw new Error('备份帖子操作格式无效');
   for(const [id,intent]of Object.entries(state.postLikeIntents||{}))if(!/^\d{1,30}$/.test(id)||typeof intent?.liked!=='boolean'||!/^[a-z0-9_]{1,15}$/i.test(intent.username||'')||!Number.isFinite(intent.at))throw new Error('备份帖子操作格式无效');
   delete state.capabilities; // Runtime evidence is never supplied by an imported backup.

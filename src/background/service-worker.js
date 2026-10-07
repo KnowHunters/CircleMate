@@ -124,7 +124,7 @@ chrome.runtime.onMessage.addListener((message, sender, respond) => {
   if (sender.id === chrome.runtime.id && sender.tab && message?.action === "FRAME_CONTEXT") {
     chrome.tabs.get(sender.tab.id).then(tab => respond(chatContext(tab.url)), () => respond(null)); return true;
   }
-  if(sender.id===chrome.runtime.id && sender.tab && sender.frameId===0 && ['POSTS_READ','POSTS_LIKE'].includes(message?.action)){
+  if(sender.id===chrome.runtime.id && sender.tab && sender.frameId===0 && ['POSTS_READ','POSTS_LIKE','POSTS_REPLY'].includes(message?.action)){
     void scheduler.add(async()=>{
       try{
         await ready;const context=chatContext((await chrome.tabs.get(sender.tab.id)).url);
@@ -132,13 +132,14 @@ chrome.runtime.onMessage.addListener((message, sender, respond) => {
         const s=await sessions.get(sender.tab.id,false);
         if(message.accountId!==s.accountId)throw new Error('登录账号已切换');
         const state=await repository.load(s.accountId);
+        if(message.action==='POSTS_REPLY'){const result=await postInteractions.reply(s,message,state,checkpoint);respond({ok:true,...result});return;}
         const data=message.action==='POSTS_LIKE'?await postInteractions.like(s,message,state,checkpoint):await postInteractions.read(s,message.username,Boolean(message.refresh));
         let changed=false;
         for(const post of data.posts){const intent=state.postLikeIntents?.[post.id];if(intent&&intent.liked===post.liked){delete state.postLikeIntents[post.id];changed=true;}else if(intent)post.unconfirmed=true;}
         if(changed)await checkpoint(s,state);else await sessions.assertCurrent(s);
         respond({ok:true,...data});
       }catch(error){respond({ok:false,error:error.message,code:error.code||'POST_FAILED',retryAt:error.retryAt||null});}
-    },message.action==='POSTS_LIKE'?2:0).catch(error=>respond({ok:false,error:error.message}));return true;
+    },message.action!=='POSTS_READ'?2:0).catch(error=>respond({ok:false,error:error.message}));return true;
   }
   const rosterActions={ROSTER_ENRICH:'ENRICH_GROUP',ROSTER_FOLLOW:'FOLLOW',ROSTER_UNFOLLOW:'UNFOLLOW',ROSTER_RECHECK:'RECHECK_MEMBER'};
   const rosterAction=Object.hasOwn(rosterActions,message?.action || '') ? rosterActions[message.action] : null;

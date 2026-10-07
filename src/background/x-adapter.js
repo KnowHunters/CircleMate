@@ -1,10 +1,11 @@
+import {nativeReplyRequest} from './reply-request.js';
 import {parseRecentPosts} from './recent-posts.js';
 import { normalizeUser } from "./domain.js";
 import { ANALYTICS_PARSER_VERSION } from './analytics-schema.js';
 import { verifiedDestroy } from './verified-writes.js';
 import { bundledEndpoints } from './bundled-endpoints.js';
 import { TransactionHeaders } from './transaction-headers.js';
-import { readInPage, readBootInPage, writePostInPage } from './page-read.js';
+import { readInPage, readBootInPage, writePostInPage, writeReplyInPage } from './page-read.js';
 export class ApiError extends Error {
   constructor(message, code, retryAt = null) { super(message); this.code = code; this.retryAt = retryAt; }
 }
@@ -45,6 +46,19 @@ export class XWebAdapter {
     if(result.data?.errors?.length)throw new ApiError('X 拒绝点赞操作，请刷新核验','API_ERROR');
     if(result.data?.data?.[liked?'favorite_tweet':'unfavorite_tweet']!=='Done')throw new ApiError('点赞结果未确认，请刷新核验','WRITE_UNCONFIRMED');
     await this.sessions.assertCurrent(s);
+  }
+  async reply(s, tweetId, text) {
+    await this.sessions.assertCurrent(s);
+    const body=structuredClone(nativeReplyRequest);body.variables.tweet_text=text;body.variables.reply.in_reply_to_tweet_id=tweetId;
+    const path=`/i/api/graphql/${body.queryId}/CreateTweet`;
+    let transactionId;try{transactionId=await this.transactions.get(s.origin,'POST',path,s);}catch{throw new ApiError('原生签名未就绪，请刷新后重试','WRITE_NOT_SENT');}
+    let result;try{const frames=await this.chrome.scripting.executeScript({target:{tabId:s.tabId,frameIds:[0]},world:'MAIN',func:writeReplyInPage,args:[{origin:s.origin,accountId:s.accountId,authorization:s.authorization,transactionId,body}]});result=frames[0]?.result;}catch{throw new ApiError('回复结果未确认，请到原帖核验','WRITE_UNCONFIRMED');}
+    if(result?.error)throw new ApiError(result.error,result.code||'WRITE_UNCONFIRMED');
+    if(result?.status===429)throw new ApiError('X 回复请求限流，请稍后重试','WRITE_NOT_SENT');
+    if(result?.data?.errors?.length)throw new ApiError('X 返回回复错误，请先到原帖核验结果','WRITE_UNCONFIRMED');
+    const tweet=result?.data?.data?.create_tweet?.tweet_results?.result,legacy=tweet?.legacy;
+    if(result?.status!==200||!/^\d{1,30}$/.test(tweet?.rest_id||'')||legacy?.user_id_str!==s.accountId||legacy?.in_reply_to_status_id_str!==tweetId||!legacy.full_text?.endsWith(text))throw new ApiError('回复结果未确认，请到原帖核验','WRITE_UNCONFIRMED');
+    await this.sessions.assertCurrent(s);return {confirmed:true,replyId:tweet.rest_id};
   }
   async nativeSnapshot(s) {
     if (!this.chrome?.tabs.sendMessage) return null;

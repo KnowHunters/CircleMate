@@ -50,3 +50,16 @@ export async function writePostInPage(input) {
     return {handled:true,status:response.status,data,reset:response.headers.get('x-rate-limit-reset')};
   }catch{return {handled:true,error:'点赞结果未确认，请刷新核验',code:'WRITE_UNCONFIRMED'};}
 }
+
+// Plain-text reply shape captured from the native editor on 2026-10-07.
+export async function writeReplyInPage(input) {
+  if(location.origin!==input.origin || !['https://x.com','https://twitter.com'].includes(location.origin) || input.body?.queryId!=='5pUpVEnRC2yGK7jaguF11w' || !/^\d{1,30}$/.test(input.body?.variables?.reply?.in_reply_to_tweet_id||'') || typeof input.body?.variables?.tweet_text!=='string' || !input.body.variables.tweet_text.trim())return {error:'回复参数无效',code:'WRITE_NOT_SENT'};
+  const cookie=name=>{try{return decodeURIComponent(document.cookie.split(';').map(x=>x.trim()).find(x=>x.startsWith(name+'='))?.slice(name.length+1)||'');}catch{return '';}};
+  const account=()=>cookie('twid').replace(/^u=/,'').replace(/"/g,'');
+  const csrf=cookie('ct0');if(!csrf||account()!==input.accountId)return {error:'登录账号已切换',code:'WRITE_NOT_SENT'};
+  try{
+    const response=await fetch('/i/api/graphql/5pUpVEnRC2yGK7jaguF11w/CreateTweet',{method:'POST',credentials:'include',redirect:'error',signal:AbortSignal.timeout(20000),headers:{'content-type':'application/json',authorization:input.authorization,'x-csrf-token':csrf,'x-twitter-active-user':'yes','x-twitter-auth-type':'OAuth2Session','x-twitter-client-language':document.documentElement.lang||'zh','x-client-transaction-id':input.transactionId},body:JSON.stringify(input.body)});
+    if(account()!==input.accountId||cookie('ct0')!==csrf)return {error:'登录账号已切换，请核验回复是否已发送',code:'WRITE_UNCONFIRMED'};
+    return {status:response.status,data:await response.json()};
+  }catch{return {error:'发送结果未确认，请到原帖核验，勿重复发送',code:'WRITE_UNCONFIRMED'};}
+}
