@@ -1,5 +1,4 @@
 import { LIST_KINDS, validId, normalizeUser, upsertUser, completeSnapshot, groupUsers, followBackUsers,recordRelationshipEvent } from "./domain.js";
-import { updateCreatorLibrary } from './creator-library.js';
 export function createServices({ adapter, checkpoint }) {
   async function syncList(s, state, kind, restart = false) {
     if (!LIST_KINDS.includes(kind)) throw new Error("不支持的名单类型");
@@ -23,10 +22,6 @@ export function createServices({ adapter, checkpoint }) {
     }
   }
   return {
-    async CREATOR_LIBRARY(s,state,message) {
-      if(message.accountId!==s.accountId)throw new Error('账号已切换，未保存');
-      updateCreatorLibrary(state,message);
-    },
     async RECHECK_FOLLOWER(s,state,message){return this.RECHECK_MEMBER(s,state,{...message,fromFollowers:true,username:state.users[message.userId]?.username});},
     async RECHECK_MEMBER(s,state,message){
       if(message.accountId!==s.accountId)throw new Error('账号已切换');

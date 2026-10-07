@@ -1,7 +1,6 @@
 // Local UI fixtures only; not included in extension builds. No X requests.
 import { createServer } from 'node:http';
 import { readFile } from 'node:fs/promises';
-import {updateCreatorLibrary} from '../src/background/creator-library.js';
 const root = new URL('../src/', import.meta.url);
 const fixture = {
   accountId: '1', account: { displayName: '林间', username: 'linjian', followingCount: 146, followersCount: 203, statusesCount: 428 },
@@ -22,17 +21,13 @@ const samples=[[2,4,920,12],[1,7,1640,18],[3,5,1320,16],[2,9,2450,28],[4,8,3100,
 for(let i=0;i<7;i++)fixture.analytics.daily[new Date(fixture.analytics.from+i*86400000).toISOString().slice(0,10)]={TweetCreate:samples[i][0],ReplyCreate:samples[i][1],Displayed:samples[i][2],Fav:samples[i][3]};
 fixture.analytics.totals=Object.fromEntries(['TweetCreate','ReplyCreate','Displayed','Fav'].map(k=>[k,Object.values(fixture.analytics.daily).reduce((n,d)=>n+d[k],0)]));
 const scenario = process.env.CIRCLEMATE_PREVIEW_SYNC;
-if(process.env.CIRCLEMATE_PREVIEW_LIBRARY){
-  updateCreatorLibrary(fixture,{command:'save',kind:'material',post:{id:'123456789',author:'alice',text:'这是创作收集的本地示例，用于检查排版和保存流程。',postedAt:'2026-10-07T00:00:00Z'}});
-  updateCreatorLibrary(fixture,{command:'save',kind:'pending',post:{id:'123456789',author:'alice',text:'这是创作收集的本地示例，用于检查排版和保存流程。'}});
-}
 if (scenario) {
  fixture.tasks = {following:{status:'paused'},followers:{status:scenario==='waiting'?'paused':'error'},verifiedFollowers:{status:'paused'}};
  fixture.autoSync = {running:false,jobs:{following:{},followers:scenario==='waiting'?{}:{error:{code:'HTTP_404'}},verifiedFollowers:scenario==='failed'?{error:{code:'HTTP_404'}}:{}}};
  if(scenario==='failed')fixture.autoSync.jobs.following={error:{code:'HTTP_404'}};
 }
 const previewPort=Number(process.env.CIRCLEMATE_PREVIEW_PORT || 4177);
-const mock = `<script>const demoState=${JSON.stringify(fixture)};const kinds=new Set(['material','pending']);const updateCreatorLibrary=${updateCreatorLibrary.toString()};globalThis.chrome={tabs:{query:async()=>[{id:1}],sendMessage:(id,m,cb)=>cb({isChat:true,groupId:'demo',accountUsername:'linjian'}),create:async()=>{}},runtime:{sendMessage:async m=>{if(m.action==='FOLLOW')demoState.groups[0].users.find(u=>u.id===m.userId).following=true;if(m.action==='CREATOR_LIBRARY')updateCreatorLibrary(demoState,m);return{ok:true,state:structuredClone(demoState)}}},storage:{local:{get:async()=>JSON.parse(localStorage.getItem('uiPrefs')||'{}'),set:async p=>localStorage.setItem('uiPrefs',JSON.stringify(p))},onChanged:{addListener(){}}}};</script>`;
+const mock = `<script>const demoState=${JSON.stringify(fixture)};globalThis.chrome={tabs:{query:async()=>[{id:1}],sendMessage:(id,m,cb)=>cb({isChat:true,groupId:'demo',accountUsername:'linjian'}),create:async()=>{}},runtime:{sendMessage:async m=>{if(m.action==='FOLLOW')demoState.groups[0].users.find(u=>u.id===m.userId).following=true;return{ok:true,state:structuredClone(demoState)}}},storage:{local:{get:async()=>JSON.parse(localStorage.getItem('uiPrefs')||'{}'),set:async p=>localStorage.setItem('uiPrefs',JSON.stringify(p))},onChanged:{addListener(){}}}};</script>`;
 createServer(async (req, res) => {
   try {
     const path = new URL(req.url, 'http://localhost').pathname;

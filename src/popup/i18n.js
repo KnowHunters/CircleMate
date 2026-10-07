@@ -27,7 +27,6 @@
     tagline: ["联系圈友，记录每次成长", "Connect with your circle"],
     minimize: ["最小化界面", "Minimize panel"], expand: ["展开界面", "Expand panel"],
     joinXGroup: ["加入 X 群聊", "Join the X group"], groupInvite: ["交流与反馈", "Discussion and feedback"],
-    creatorLibrary: ["创作收集", "Creator library"],
     projectInfo: ["项目信息", "Project info"],
     projectDescription: ["在本机整理 X 账号关系、筛选群成员、管理关注队列，查看创作与曝光趋势。", "Organize X relationships locally, filter group members, manage follow queues, and review creation and impression trends."],
     navigation: ["CircleMate 页面", "CircleMate views"], live: ["实时", "Live"], data: ["数据", "Data"], guide: ["说明", "Guide"],

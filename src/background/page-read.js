@@ -30,3 +30,23 @@ export async function readBootInPage(input) {
   const map=[...document.scripts].map(s=>s.textContent).filter(s=>s.includes('ondemand.s')).join('');
   return {ok:response.ok,html:html + map};
 }
+// Native JSON write shape verified 2026-10-07. Never replay an ambiguous POST.
+export async function writePostInPage(input) {
+  const ids={FavoriteTweet:'lI07N6Otwv1PhnEgXILM7A',UnfavoriteTweet:'ZYKSe-w7KEslx3JhSIk5LA'};
+  if(location.origin!==input.origin || !['https://x.com','https://twitter.com'].includes(location.origin) ||
+     !Object.hasOwn(ids,input.operation) || !/^\d{1,30}$/.test(input.tweetId||''))return {handled:false};
+  const cookie=name=>{try{return decodeURIComponent(document.cookie.split(';').map(x=>x.trim()).find(x=>x.startsWith(name+'='))?.slice(name.length+1)||'');}catch{return '';}};
+  const account=()=>cookie('twid').replace(/^u=/,'').replace(/"/g,'');
+  const csrf=cookie('ct0');
+  if(!csrf || account()!==input.accountId)return {handled:true,error:'登录账号已切换',code:'ACCOUNT_MISMATCH'};
+  try{
+    const response=await fetch(`/i/api/graphql/${ids[input.operation]}/${input.operation}`,{method:'POST',credentials:'include',redirect:'error',signal:AbortSignal.timeout(20000),
+      headers:{'content-type':'application/json',accept:'application/json',authorization:input.authorization,'x-csrf-token':csrf,
+        'x-twitter-active-user':'yes','x-twitter-auth-type':'OAuth2Session','x-twitter-client-language':document.documentElement.lang||'zh',
+        ...(input.transactionId?{'x-client-transaction-id':input.transactionId}:{})},
+      body:JSON.stringify({variables:{tweet_id:input.tweetId},queryId:ids[input.operation]})});
+    if(account()!==input.accountId||cookie('ct0')!==csrf)return {handled:true,error:'登录账号已切换',code:'ACCOUNT_MISMATCH'};
+    let data;try{data=await response.json();}catch{return {handled:true,error:'点赞结果未确认，请刷新核验',code:'WRITE_UNCONFIRMED'};}
+    return {handled:true,status:response.status,data,reset:response.headers.get('x-rate-limit-reset')};
+  }catch{return {handled:true,error:'点赞结果未确认，请刷新核验',code:'WRITE_UNCONFIRMED'};}
+}

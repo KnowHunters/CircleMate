@@ -17,6 +17,8 @@ export function validateBackup(input, accountId) {
   if(!input||JSON.stringify(input).length>8*1024*1024)throw new Error('备份文件无效或超过 8 MB');
   const state=migrateAccount(input,accountId);
   validateCreatorLibrary(state.creatorLibrary);
+  if(state.postLikeIntents && (Array.isArray(state.postLikeIntents)||Object.keys(state.postLikeIntents).length>100))throw new Error('备份帖子操作格式无效');
+  for(const [id,intent]of Object.entries(state.postLikeIntents||{}))if(!/^\d{1,30}$/.test(id)||typeof intent?.liked!=='boolean'||!/^[a-z0-9_]{1,15}$/i.test(intent.username||'')||!Number.isFinite(intent.at))throw new Error('备份帖子操作格式无效');
   delete state.capabilities; // Runtime evidence is never supplied by an imported backup.
   if(!state.users||Array.isArray(state.users)||!state.groups||Array.isArray(state.groups))throw new Error('备份结构不完整');
   for(const [id,user]of Object.entries(state.users))if(!/^\d{1,30}$/.test(id)||user?.id!==id||!/^[a-z0-9_]{1,15}$/i.test(user.username||''))throw new Error('备份成员格式无效');

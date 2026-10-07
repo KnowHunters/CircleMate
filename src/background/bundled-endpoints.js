@@ -40,9 +40,10 @@ const records = [
   record('Followers','mrqxgX8JzwlL6pvYiC5CPA',listDefaults),
   record('BlueVerifiedFollowers','ck_SV_kTAlbD2WZiOFNbzw',listDefaults),
   record('UserByScreenName','KybxDj9RrADIITXlGG8kpw',{withGrokTranslatedBio:true},profileFeatures,{withPayments:false,withAuxiliaryUserLabels:true}),
-  record('UserOriginalsTimeline','qtvmQffnepvr0oPe4A8MqQ',{count:20,includePromotedContent:true,withQuickPromoteEligibilityTweetFields:true,withVoice:true},timelineFeatures,tweetToggles),
+  record('UserOriginalsTimeline','ty409m9cIpSEnLECl_SqMw',{count:20,includePromotedContent:true,withQuickPromoteEligibilityTweetFields:true,withVoice:true},timelineFeatures,tweetToggles),
   record('UserRepliesTimeline','9FLI4sKKO6rEojPOEHT7BA',{count:20,includePromotedContent:true,withCommunity:true,withVoice:true},timelineFeatures,tweetToggles),
   record('UserRepostsTimeline','hkQQA_PMJfzHlRtnUYYXMg',{count:20,includePromotedContent:true,withVoice:true},timelineFeatures,tweetToggles),
   record('accountOverviewDailyQuery','2hqAR3h2xhN1cUrUBZypyg',{show_realtime_active_followers:true,show_verified_followers:true},{})
 ];
-export function bundledEndpoints() { return structuredClone(Object.fromEntries(records.map(r=>[r.operation,r]))); }
+export function bundledEndpoints() { const result=structuredClone(Object.fromEntries(records.map(r=>[r.operation,r])));
+  Object.assign(result.UserOriginalsTimeline,{observedAt:1791342657000,lastResponseAt:1791342657000,verifiedOn:'2026-10-07'});return result; }

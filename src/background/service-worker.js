@@ -1,3 +1,4 @@
+import {PostInteractions} from './post-interactions.js';
 import { AccountRepository } from "./repository.js";
 import { SessionProvider } from "./session.js";
 import { EndpointRegistry } from "./endpoint-registry.js";
@@ -16,6 +17,7 @@ const ready = registry.load();
 const checkpoint = async (s, state) => { await sessions.assertCurrent(s);state.capabilities={unfollow:registry.hasWriteEvidence('destroy')}; return repository.save(state); };
 const adapter = new XWebAdapter({ fetch: globalThis.fetch.bind(globalThis), sessions, registry, chrome });
 const services = createServices({ adapter, checkpoint });
+const postInteractions=new PostInteractions(adapter);
 const pendingTabs = new Set();
 const nativeWrites=new Map();
 chrome.webRequest.onBeforeRequest?.addListener(details=>{
@@ -122,14 +124,29 @@ chrome.runtime.onMessage.addListener((message, sender, respond) => {
   if (sender.id === chrome.runtime.id && sender.tab && message?.action === "FRAME_CONTEXT") {
     chrome.tabs.get(sender.tab.id).then(tab => respond(chatContext(tab.url)), () => respond(null)); return true;
   }
+  if(sender.id===chrome.runtime.id && sender.tab && sender.frameId===0 && ['POSTS_READ','POSTS_LIKE'].includes(message?.action)){
+    void scheduler.add(async()=>{
+      try{
+        await ready;const context=chatContext((await chrome.tabs.get(sender.tab.id)).url);
+        if(!context?.isInfo || context.groupId!==message.groupId)throw new Error('成员列表已关闭或群聊已切换');
+        const s=await sessions.get(sender.tab.id,false);
+        if(message.accountId!==s.accountId)throw new Error('登录账号已切换');
+        const state=await repository.load(s.accountId);
+        const data=message.action==='POSTS_LIKE'?await postInteractions.like(s,message,state,checkpoint):await postInteractions.read(s,message.username,Boolean(message.refresh));
+        let changed=false;
+        for(const post of data.posts){const intent=state.postLikeIntents?.[post.id];if(intent&&intent.liked===post.liked){delete state.postLikeIntents[post.id];changed=true;}else if(intent)post.unconfirmed=true;}
+        if(changed)await checkpoint(s,state);else await sessions.assertCurrent(s);
+        respond({ok:true,...data});
+      }catch(error){respond({ok:false,error:error.message,code:error.code||'POST_FAILED',retryAt:error.retryAt||null});}
+    },message.action==='POSTS_LIKE'?2:0).catch(error=>respond({ok:false,error:error.message}));return true;
+  }
   const rosterActions={ROSTER_ENRICH:'ENRICH_GROUP',ROSTER_FOLLOW:'FOLLOW',ROSTER_UNFOLLOW:'UNFOLLOW',ROSTER_RECHECK:'RECHECK_MEMBER'};
   const rosterAction=Object.hasOwn(rosterActions,message?.action || '') ? rosterActions[message.action] : null;
   const rosterInline=Boolean(rosterAction && sender.id===chrome.runtime.id && sender.tab);
   if(rosterAction && sender.id === chrome.runtime.id && sender.tab) message={...message,action:rosterAction};
   if(['FOLLOW','RECHECK_MEMBER'].includes(message?.action))message={...message,fromFollowers:false};
   if ((!Object.hasOwn(services, message?.action || "") && !['QUEUE_CONTROL','EXPORT_BACKUP','RESTORE_BACKUP'].includes(message?.action)) || sender.id !== chrome.runtime.id) return false;
-  if(message.action==='CREATOR_LIBRARY'&&sender.tab&&(sender.frameId!==0||!/^https:\/\/(x\.com|twitter\.com)\//.test(sender.url||'')))return false;
-  if (sender.tab && !rosterInline && !["ROSTER", "ROSTER_REFERENCES",'QUEUE_CONTROL','CREATOR_LIBRARY'].includes(message.action)) return false;
+  if (sender.tab && !rosterInline && !["ROSTER", "ROSTER_REFERENCES",'QUEUE_CONTROL'].includes(message.action)) return false;
   if (!sender.tab && ["ROSTER", "ROSTER_REFERENCES"].includes(message.action)) return false;
   const run = async () => {
     let s;
@@ -139,7 +156,7 @@ chrome.runtime.onMessage.addListener((message, sender, respond) => {
         if (!context?.groupId || context.groupId !== message.groupId) throw new Error("群聊已切换，请重新打开插件");
         if ((message.action === "ROSTER_REFERENCES" || message.action === 'ENRICH_GROUP') && !context.isInfo) throw new Error("成员采集仅限群信息页");
       }
-      s = await sessions.get(sender.tab?.id ?? message.tabId, !["ROSTER", "ROSTER_REFERENCES", "GET_STATE",'CREATOR_LIBRARY'].includes(message.action));
+      s = await sessions.get(sender.tab?.id ?? message.tabId, !["ROSTER", "ROSTER_REFERENCES", "GET_STATE"].includes(message.action));
       if(message.accountId&&message.accountId!==s.accountId)throw new Error('账号已切换，已取消此操作');
       let state = await repository.load(s.accountId);
       if(message.action==='EXPORT_BACKUP'){respond({ok:true,backup:state});return;}

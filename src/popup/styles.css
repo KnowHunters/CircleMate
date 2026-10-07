@@ -978,11 +978,3 @@ html[data-embedded=true] .app{
 .project-external{margin-left:auto;color:#657780}
 .project-info-links a:hover{background:#edf4f1;border-color:#a9c8bb}
 .project-info-links a:focus-visible{outline:2px solid #168252;outline-offset:2px}
-.creator-library-list{max-height:420px;overflow:auto;margin-top:12px}
-.creator-library-post{padding:12px 0;border-top:1px solid var(--line)}
-.creator-library-post:first-child{border-top:0;padding-top:0}
-.creator-library-head{display:flex;justify-content:space-between;gap:8px;font-size:11px}
-.creator-library-head a{color:var(--green);text-decoration:none}
-.creator-library-text{font-size:12px;line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere;max-height:150px;overflow:auto}
-.creator-library-post textarea{box-sizing:border-box;width:100%;resize:vertical;border:1px solid var(--line);border-radius:8px;padding:8px;font:11px system-ui;color:inherit;background:var(--soft);margin-bottom:8px}
-#creator-library-filters button[aria-pressed=true]{background:var(--green);color:#fff;border-color:var(--green)}

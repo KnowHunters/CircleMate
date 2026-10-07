@@ -219,7 +219,7 @@
     }
     list.scrollTop=scrollTop;
   }
-  function renderAll() { renderAccount(); renderFollowBack(); globalThis.CircleMate.renderCreatorLibrary?.(state,activeTabId,language); renderStatus(); showView(selectedView); }
+  function renderAll() { renderAccount(); renderFollowBack(); renderStatus(); showView(selectedView); }
   async function callService(action, extra = {}) {
     if (busy) return;
     busy = true; notice = { key: "requesting" };

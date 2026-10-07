@@ -1,9 +1,10 @@
+import {parseRecentPosts} from './recent-posts.js';
 import { normalizeUser } from "./domain.js";
 import { ANALYTICS_PARSER_VERSION } from './analytics-schema.js';
 import { verifiedDestroy } from './verified-writes.js';
 import { bundledEndpoints } from './bundled-endpoints.js';
 import { TransactionHeaders } from './transaction-headers.js';
-import { readInPage, readBootInPage } from './page-read.js';
+import { readInPage, readBootInPage, writePostInPage } from './page-read.js';
 export class ApiError extends Error {
   constructor(message, code, retryAt = null) { super(message); this.code = code; this.retryAt = retryAt; }
 }
@@ -25,6 +26,26 @@ export function parseUserPage(payload) {
   return { users, cursor: terminated ? null : bottom, complete: terminated, source: "graphql" };
 }
 export class XWebAdapter {
+  async recentPosts(s, user) {
+    const record=this.registry.records.UserOriginalsTimeline;
+    if(!record)throw new ApiError('请打开原生帖子页后重试','ENDPOINT_MISSING');
+    return parseRecentPosts(await this.graphql(s,record,{userId:user.id}),user.id,user.username,20);
+  }
+  async setPostLike(s, tweetId, liked) {
+    await this.sessions.assertCurrent(s);
+    const operation=liked?'FavoriteTweet':'UnfavoriteTweet',queryId=liked?'lI07N6Otwv1PhnEgXILM7A':'ZYKSe-w7KEslx3JhSIk5LA';
+    const path=`/i/api/graphql/${queryId}/${operation}`;
+    let transactionId;try{transactionId=await this.transactions.get(s.origin,'POST',path,s);}catch{throw new ApiError('原生请求签名未就绪，请刷新后重试','WRITE_NOT_SENT');}
+    let result;
+    try { const frames=await this.chrome.scripting.executeScript({target:{tabId:s.tabId,frameIds:[0]},world:'MAIN',func:writePostInPage,
+      args:[{origin:s.origin,accountId:s.accountId,authorization:s.authorization,transactionId,operation,tweetId}]});result=frames[0]?.result; }
+    catch { throw new ApiError('点赞结果未确认，请刷新核验','WRITE_UNCONFIRMED'); }
+    if(!result?.handled || result.error)throw new ApiError(result?.error||'点赞结果未确认，请刷新核验',result?.code||'WRITE_UNCONFIRMED');
+    if(result.status!==200)throw new ApiError(`X 点赞请求失败（${result.status}），请刷新核验`,result.status===429?'HTTP_429':'WRITE_UNCONFIRMED',result.status===429?(Number(result.reset)>0?Number(result.reset)*1000:Date.now()+60000):null);
+    if(result.data?.errors?.length)throw new ApiError('X 拒绝点赞操作，请刷新核验','API_ERROR');
+    if(result.data?.data?.[liked?'favorite_tweet':'unfavorite_tweet']!=='Done')throw new ApiError('点赞结果未确认，请刷新核验','WRITE_UNCONFIRMED');
+    await this.sessions.assertCurrent(s);
+  }
   async nativeSnapshot(s) {
     if (!this.chrome?.tabs.sendMessage) return null;
     try { return await this.chrome.tabs.sendMessage(s.tabId, { type: 'CIRCLEMATE_NATIVE_SNAPSHOT' }, { frameId: 0 }); } catch { return null; }

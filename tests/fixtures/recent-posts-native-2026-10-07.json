@@ -1,0 +1,664 @@
+{
+  "data": {
+    "user": {
+      "result": {
+        "__typename": "User",
+        "timeline": {
+          "timeline": {
+            "instructions": [
+              {
+                "type": "TimelineClearCache"
+              },
+              {
+                "type": "TimelineAddEntries",
+                "entries": [
+                  {
+                    "entryId": "tweet-2107288027710308376",
+                    "content": {
+                      "itemContent": {
+                        "itemType": "TimelineTweet",
+                        "tweet_results": {
+                          "result": {
+                            "__typename": "Tweet",
+                            "rest_id": "2107288027710308376",
+                            "legacy": {
+                              "bookmark_count": 0,
+                              "bookmarked": false,
+                              "conversation_id_str": "2107288027710308376",
+                              "created_at": "Tue Oct 06 01:53:11 +0000 2026",
+                              "display_text_range": [
+                                0,
+                                61
+                              ],
+                              "entities": {
+                                "media": [
+                                  {
+                                    "allow_download_status": {
+                                      "allow_download": true
+                                    },
+                                    "display_url": "pic.x.com/tQ1MwaBYW8",
+                                    "expanded_url": "https://x.com/jiaoxiawo/status/2107288027710308376/photo/1",
+                                    "ext_media_availability": {
+                                      "status": "Available"
+                                    },
+                                    "features": {
+                                      "large": {
+                                        "faces": []
+                                      },
+                                      "medium": {
+                                        "faces": []
+                                      },
+                                      "orig": {
+                                        "faces": []
+                                      },
+                                      "small": {
+                                        "faces": []
+                                      }
+                                    },
+                                    "id_str": "2107287481012162560",
+                                    "indices": [
+                                      62,
+                                      85
+                                    ],
+                                    "media_key": "3_2107287481012162560",
+                                    "media_results": {
+                                      "result": {
+                                        "media_key": "3_2107287481012162560"
+                                      }
+                                    },
+                                    "media_url_https": "https://pbs.twimg.com/media/HT6WzJFbkAAaNv1.png",
+                                    "original_info": {
+                                      "focus_rects": [
+                                        {
+                                          "h": 332,
+                                          "w": 593,
+                                          "x": 0,
+                                          "y": 26
+                                        },
+                                        {
+                                          "h": 416,
+                                          "w": 416,
+                                          "x": 0,
+                                          "y": 0
+                                        },
+                                        {
+                                          "h": 416,
+                                          "w": 365,
+                                          "x": 0,
+                                          "y": 0
+                                        },
+                                        {
+                                          "h": 416,
+                                          "w": 208,
+                                          "x": 0,
+                                          "y": 0
+                                        },
+                                        {
+                                          "h": 416,
+                                          "w": 593,
+                                          "x": 0,
+                                          "y": 0
+                                        }
+                                      ],
+                                      "height": 416,
+                                      "width": 593
+                                    },
+                                    "sizes": {
+                                      "large": {
+                                        "h": 416,
+                                        "resize": "fit",
+                                        "w": 593
+                                      },
+                                      "medium": {
+                                        "h": 416,
+                                        "resize": "fit",
+                                        "w": 593
+                                      },
+                                      "small": {
+                                        "h": 416,
+                                        "resize": "fit",
+                                        "w": 593
+                                      },
+                                      "thumb": {
+                                        "h": 150,
+                                        "resize": "crop",
+                                        "w": 150
+                                      }
+                                    },
+                                    "type": "photo",
+                                    "url": "https://t.co/tQ1MwaBYW8"
+                                  }
+                                ]
+                              },
+                              "extended_entities": {
+                                "media": [
+                                  {
+                                    "allow_download_status": {
+                                      "allow_download": true
+                                    },
+                                    "display_url": "pic.x.com/tQ1MwaBYW8",
+                                    "expanded_url": "https://x.com/jiaoxiawo/status/2107288027710308376/photo/1",
+                                    "ext_media_availability": {
+                                      "status": "Available"
+                                    },
+                                    "features": {
+                                      "large": {
+                                        "faces": []
+                                      },
+                                      "medium": {
+                                        "faces": []
+                                      },
+                                      "orig": {
+                                        "faces": []
+                                      },
+                                      "small": {
+                                        "faces": []
+                                      }
+                                    },
+                                    "id_str": "2107287481012162560",
+                                    "indices": [
+                                      62,
+                                      85
+                                    ],
+                                    "media_key": "3_2107287481012162560",
+                                    "media_results": {
+                                      "result": {
+                                        "media_key": "3_2107287481012162560"
+                                      }
+                                    },
+                                    "media_url_https": "https://pbs.twimg.com/media/HT6WzJFbkAAaNv1.png",
+                                    "original_info": {
+                                      "focus_rects": [
+                                        {
+                                          "h": 332,
+                                          "w": 593,
+                                          "x": 0,
+                                          "y": 26
+                                        },
+                                        {
+                                          "h": 416,
+                                          "w": 416,
+                                          "x": 0,
+                                          "y": 0
+                                        },
+                                        {
+                                          "h": 416,
+                                          "w": 365,
+                                          "x": 0,
+                                          "y": 0
+                                        },
+                                        {
+                                          "h": 416,
+                                          "w": 208,
+                                          "x": 0,
+                                          "y": 0
+                                        },
+                                        {
+                                          "h": 416,
+                                          "w": 593,
+                                          "x": 0,
+                                          "y": 0
+                                        }
+                                      ],
+                                      "height": 416,
+                                      "width": 593
+                                    },
+                                    "sizes": {
+                                      "large": {
+                                        "h": 416,
+                                        "resize": "fit",
+                                        "w": 593
+                                      },
+                                      "medium": {
+                                        "h": 416,
+                                        "resize": "fit",
+                                        "w": 593
+                                      },
+                                      "small": {
+                                        "h": 416,
+                                        "resize": "fit",
+                                        "w": 593
+                                      },
+                                      "thumb": {
+                                        "h": 150,
+                                        "resize": "crop",
+                                        "w": 150
+                                      }
+                                    },
+                                    "type": "photo",
+                                    "url": "https://t.co/tQ1MwaBYW8"
+                                  }
+                                ]
+                              },
+                              "favorite_count": 0,
+                              "favorited": false,
+                              "full_text": "开蓝V后，首先要完成这两个艰巨的任务，前面那个500粉丝任务还算好完成，后面那个50万次时间线曝光，还是有难度的，学习中。 https://t.co/tQ1MwaBYW8",
+                              "id_str": "2107288027710308376",
+                              "is_quote_status": false,
+                              "lang": "zh",
+                              "possibly_sensitive": false,
+                              "possibly_sensitive_editable": true,
+                              "quote_count": 0,
+                              "reply_count": 0,
+                              "retweet_count": 0,
+                              "retweeted": false,
+                              "user_id_str": "1638101918869524482"
+                            },
+                            "core": {
+                              "user_results": {
+                                "result": {
+                                  "rest_id": "1638101918869524482",
+                                  "core": {
+                                    "screen_name": "jiaoxiawo"
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "entryId": "profile-originals-conversation-2107671508426948609",
+                    "content": {
+                      "items": [
+                        {
+                          "entryId": "profile-originals-conversation-2107671508426948609-tweet-2107285421222928664",
+                          "item": {
+                            "itemContent": {
+                              "itemType": "TimelineTweet",
+                              "tweet_results": {
+                                "result": {
+                                  "__typename": "Tweet",
+                                  "rest_id": "2107285421222928664",
+                                  "legacy": {
+                                    "bookmark_count": 0,
+                                    "bookmarked": false,
+                                    "conversation_id_str": "2107285421222928664",
+                                    "created_at": "Tue Oct 06 01:42:50 +0000 2026",
+                                    "display_text_range": [
+                                      0,
+                                      108
+                                    ],
+                                    "entities": {},
+                                    "favorite_count": 0,
+                                    "favorited": false,
+                                    "full_text": "昨天一时冲动充了蓝V，还没想好要如何运营这个账号，方向是什么。\n\n充蓝V的时候，发现网页端提示我前两个月$4优惠，以后每月$8，但看到手机端，却提示我前两个月$5.5，以后每月$11，同样账号也会有这样的区别？杀熟？",
+                                    "id_str": "2107285421222928664",
+                                    "is_quote_status": false,
+                                    "lang": "zh",
+                                    "quote_count": 0,
+                                    "reply_count": 1,
+                                    "retweet_count": 0,
+                                    "retweeted": false,
+                                    "user_id_str": "1638101918869524482"
+                                  },
+                                  "core": {
+                                    "user_results": {
+                                      "result": {
+                                        "rest_id": "1638101918869524482",
+                                        "core": {
+                                          "screen_name": "jiaoxiawo"
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        },
+                        {
+                          "entryId": "profile-originals-conversation-2107671508426948609-tweet-2107293806991392790",
+                          "item": {
+                            "itemContent": {
+                              "itemType": "TimelineTweet",
+                              "tweet_results": {
+                                "result": {
+                                  "__typename": "Tweet",
+                                  "rest_id": "2107293806991392790",
+                                  "legacy": {
+                                    "bookmark_count": 0,
+                                    "bookmarked": false,
+                                    "conversation_id_str": "2107285421222928664",
+                                    "created_at": "Tue Oct 06 02:16:09 +0000 2026",
+                                    "display_text_range": [
+                                      0,
+                                      32
+                                    ],
+                                    "entities": {
+                                      "media": [
+                                        {
+                                          "allow_download_status": {
+                                            "allow_download": true
+                                          },
+                                          "display_url": "pic.x.com/8EHzWUyb9J",
+                                          "expanded_url": "https://x.com/jiaoxiawo/status/2107293806991392790/photo/1",
+                                          "ext_media_availability": {
+                                            "status": "Available"
+                                          },
+                                          "features": {
+                                            "large": {
+                                              "faces": []
+                                            },
+                                            "medium": {
+                                              "faces": []
+                                            },
+                                            "orig": {
+                                              "faces": []
+                                            },
+                                            "small": {
+                                              "faces": []
+                                            }
+                                          },
+                                          "id_str": "2107293524429524992",
+                                          "indices": [
+                                            33,
+                                            56
+                                          ],
+                                          "media_key": "3_2107293524429524992",
+                                          "media_results": {
+                                            "result": {
+                                              "media_key": "3_2107293524429524992"
+                                            }
+                                          },
+                                          "media_url_https": "https://pbs.twimg.com/media/HT6cS6kaUAAl_yU.png",
+                                          "original_info": {
+                                            "focus_rects": [
+                                              {
+                                                "h": 428,
+                                                "w": 764,
+                                                "x": 0,
+                                                "y": 146
+                                              },
+                                              {
+                                                "h": 574,
+                                                "w": 574,
+                                                "x": 190,
+                                                "y": 0
+                                              },
+                                              {
+                                                "h": 574,
+                                                "w": 504,
+                                                "x": 260,
+                                                "y": 0
+                                              },
+                                              {
+                                                "h": 574,
+                                                "w": 287,
+                                                "x": 372,
+                                                "y": 0
+                                              },
+                                              {
+                                                "h": 574,
+                                                "w": 764,
+                                                "x": 0,
+                                                "y": 0
+                                              }
+                                            ],
+                                            "height": 574,
+                                            "width": 764
+                                          },
+                                          "sizes": {
+                                            "large": {
+                                              "h": 574,
+                                              "resize": "fit",
+                                              "w": 764
+                                            },
+                                            "medium": {
+                                              "h": 574,
+                                              "resize": "fit",
+                                              "w": 764
+                                            },
+                                            "small": {
+                                              "h": 511,
+                                              "resize": "fit",
+                                              "w": 680
+                                            },
+                                            "thumb": {
+                                              "h": 150,
+                                              "resize": "crop",
+                                              "w": 150
+                                            }
+                                          },
+                                          "type": "photo",
+                                          "url": "https://t.co/8EHzWUyb9J"
+                                        }
+                                      ]
+                                    },
+                                    "extended_entities": {
+                                      "media": [
+                                        {
+                                          "allow_download_status": {
+                                            "allow_download": true
+                                          },
+                                          "display_url": "pic.x.com/8EHzWUyb9J",
+                                          "expanded_url": "https://x.com/jiaoxiawo/status/2107293806991392790/photo/1",
+                                          "ext_media_availability": {
+                                            "status": "Available"
+                                          },
+                                          "features": {
+                                            "large": {
+                                              "faces": []
+                                            },
+                                            "medium": {
+                                              "faces": []
+                                            },
+                                            "orig": {
+                                              "faces": []
+                                            },
+                                            "small": {
+                                              "faces": []
+                                            }
+                                          },
+                                          "id_str": "2107293524429524992",
+                                          "indices": [
+                                            33,
+                                            56
+                                          ],
+                                          "media_key": "3_2107293524429524992",
+                                          "media_results": {
+                                            "result": {
+                                              "media_key": "3_2107293524429524992"
+                                            }
+                                          },
+                                          "media_url_https": "https://pbs.twimg.com/media/HT6cS6kaUAAl_yU.png",
+                                          "original_info": {
+                                            "focus_rects": [
+                                              {
+                                                "h": 428,
+                                                "w": 764,
+                                                "x": 0,
+                                                "y": 146
+                                              },
+                                              {
+                                                "h": 574,
+                                                "w": 574,
+                                                "x": 190,
+                                                "y": 0
+                                              },
+                                              {
+                                                "h": 574,
+                                                "w": 504,
+                                                "x": 260,
+                                                "y": 0
+                                              },
+                                              {
+                                                "h": 574,
+                                                "w": 287,
+                                                "x": 372,
+                                                "y": 0
+                                              },
+                                              {
+                                                "h": 574,
+                                                "w": 764,
+                                                "x": 0,
+                                                "y": 0
+                                              }
+                                            ],
+                                            "height": 574,
+                                            "width": 764
+                                          },
+                                          "sizes": {
+                                            "large": {
+                                              "h": 574,
+                                              "resize": "fit",
+                                              "w": 764
+                                            },
+                                            "medium": {
+                                              "h": 574,
+                                              "resize": "fit",
+                                              "w": 764
+                                            },
+                                            "small": {
+                                              "h": 511,
+                                              "resize": "fit",
+                                              "w": 680
+                                            },
+                                            "thumb": {
+                                              "h": 150,
+                                              "resize": "crop",
+                                              "w": 150
+                                            }
+                                          },
+                                          "type": "photo",
+                                          "url": "https://t.co/8EHzWUyb9J"
+                                        }
+                                      ]
+                                    },
+                                    "favorite_count": 0,
+                                    "favorited": false,
+                                    "full_text": "找到原因了，原来是Google Play 要抽成，误会 X 了。 https://t.co/8EHzWUyb9J",
+                                    "id_str": "2107293806991392790",
+                                    "in_reply_to_screen_name": "jiaoxiawo",
+                                    "in_reply_to_status_id_str": "2107285421222928664",
+                                    "in_reply_to_user_id_str": "1638101918869524482",
+                                    "is_quote_status": false,
+                                    "lang": "zh",
+                                    "possibly_sensitive": false,
+                                    "possibly_sensitive_editable": true,
+                                    "quote_count": 0,
+                                    "reply_count": 0,
+                                    "retweet_count": 0,
+                                    "retweeted": false,
+                                    "user_id_str": "1638101918869524482"
+                                  },
+                                  "core": {
+                                    "user_results": {
+                                      "result": {
+                                        "rest_id": "1638101918869524482",
+                                        "core": {
+                                          "screen_name": "jiaoxiawo"
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "entryId": "tweet-1638107334219276291",
+                    "content": {
+                      "itemContent": {
+                        "itemType": "TimelineTweet",
+                        "tweet_results": {
+                          "result": {
+                            "__typename": "Tweet",
+                            "rest_id": "1638107334219276291",
+                            "legacy": {
+                              "bookmark_count": 0,
+                              "bookmarked": false,
+                              "conversation_id_str": "1638107334219276291",
+                              "created_at": "Tue Mar 21 09:16:37 +0000 2023",
+                              "display_text_range": [
+                                0,
+                                5
+                              ],
+                              "entities": {},
+                              "favorite_count": 0,
+                              "favorited": false,
+                              "full_text": "hello",
+                              "id_str": "1638107334219276291",
+                              "is_quote_status": false,
+                              "lang": "en",
+                              "quote_count": 0,
+                              "reply_count": 0,
+                              "retweet_count": 0,
+                              "retweeted": false,
+                              "user_id_str": "1638101918869524482"
+                            },
+                            "core": {
+                              "user_results": {
+                                "result": {
+                                  "rest_id": "1638101918869524482",
+                                  "core": {
+                                    "screen_name": "jiaoxiawo"
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "entryId": "who-to-follow-2107671508426948611",
+                    "content": {
+                      "items": [
+                        {
+                          "entryId": "who-to-follow-2107671508426948611-user-1110227028",
+                          "item": {
+                            "itemContent": {
+                              "itemType": "TimelineUser"
+                            }
+                          }
+                        },
+                        {
+                          "entryId": "who-to-follow-2107671508426948611-user-2663331055",
+                          "item": {
+                            "itemContent": {
+                              "itemType": "TimelineUser"
+                            }
+                          }
+                        },
+                        {
+                          "entryId": "who-to-follow-2107671508426948611-user-1800594921704898560",
+                          "item": {
+                            "itemContent": {
+                              "itemType": "TimelineUser"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "entryId": "cursor-top-2107671508426948609",
+                    "content": {
+                      "cursorType": "Top",
+                      "value": "redacted"
+                    }
+                  },
+                  {
+                    "entryId": "cursor-bottom-2107671508426948604",
+                    "content": {
+                      "cursorType": "Bottom",
+                      "value": "redacted"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
+}
