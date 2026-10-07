@@ -4,7 +4,7 @@
   const api = globalThis.CircleMate ||= {};
   const drafts = new Map();
   // The verified transport is supplied by the post panel; this view owns no endpoint.
-  api.createInlineReply = ({accountId, tweetId, username, onSend, onNative, onClose}) => {
+  api.createInlineReply = ({accountId, tweetId, username, onSend, onClose}) => {
     const key = `${accountId}:${tweetId}`;
     const form = document.createElement('form');
     form.className = 'cm-inline-reply';
@@ -28,7 +28,6 @@
       item.textContent = text;
       return item;
     };
-    const native = button('原生回复框 ↗');
     const cancel = button('收起');
     const send = button('发送回复', 'submit');
     send.className = 'cm-inline-send';
@@ -36,7 +35,6 @@
     const update = () => {
       send.disabled = pending || locked || !input.value.trim() || typeof onSend !== 'function';
       cancel.disabled = pending;
-      native.disabled = pending || locked;
       input.readOnly = pending || locked;
       form.setAttribute('aria-busy', String(pending));
     };
@@ -46,7 +44,6 @@
       update();
     });
     cancel.onclick = () => { if (!pending) onClose(); };
-    native.onclick = event => { if (event.isTrusted && !pending && !locked) onNative(input.value); };
     form.onsubmit = async event => {
       event.preventDefault();
       if (!event.isTrusted || send.disabled) return;
@@ -72,7 +69,7 @@
         update();
       }
     };
-    actions.append(native, cancel, send);
+    actions.append(cancel, send);
     form.append(label, status, actions);
     update();
     return {element: form, focus: () => input.focus({preventScroll: true})};
