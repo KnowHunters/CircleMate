@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "CircleMate",
-  "version": "0.5.25",
+  "version": "0.5.26",
   "description": "A local-first X relationship organizer for new users.",
   "permissions": [
     "storage",
@@ -31,10 +31,11 @@
         "shared/dialog-style.js",
         "shared/native-page.js",
         "shared/roster.js",
+        "shared/timeline-context.js",
         "content/content.js",
         "content/roster-ui.js",
-        "content/quick-reply.js",
         "content/inline-reply.js",
+        "content/quick-reply.js",
         "content/profile-posts.js",
         "content/panel.js"
       ],

@@ -1,4 +1,5 @@
 import {PostInteractions} from './post-interactions.js';
+import '../shared/timeline-context.js';
 import { AccountRepository } from "./repository.js";
 import { SessionProvider } from "./session.js";
 import { EndpointRegistry } from "./endpoint-registry.js";
@@ -124,15 +125,17 @@ chrome.runtime.onMessage.addListener((message, sender, respond) => {
   if (sender.id === chrome.runtime.id && sender.tab && message?.action === "FRAME_CONTEXT") {
     chrome.tabs.get(sender.tab.id).then(tab => respond(chatContext(tab.url)), () => respond(null)); return true;
   }
-  if(sender.id===chrome.runtime.id && sender.tab && sender.frameId===0 && ['POSTS_READ','POSTS_LIKE','POSTS_REPLY'].includes(message?.action)){
+  if(sender.id===chrome.runtime.id && sender.tab && sender.frameId===0 && ['POSTS_READ','POSTS_LIKE','POSTS_REPLY','TIMELINE_REPLY'].includes(message?.action)){
     void scheduler.add(async()=>{
       try{
-        await ready;const context=chatContext((await chrome.tabs.get(sender.tab.id)).url);
-        if(!context?.isInfo || context.groupId!==message.groupId)throw new Error('成员列表已关闭或群聊已切换');
+        await ready;const tabUrl=new URL((await chrome.tabs.get(sender.tab.id)).url),context=chatContext(tabUrl.href);
+        const timeline=message.action==='TIMELINE_REPLY';
+        if(timeline){if(!['https://x.com','https://twitter.com'].includes(tabUrl.origin)||!globalThis.CircleMate.isTimelinePath(tabUrl.pathname))throw Object.assign(new Error('时间线已关闭，请重新打开回复框'),{code:'WRITE_NOT_SENT'});}
+        else if(!context?.isInfo || context.groupId!==message.groupId)throw new Error('成员列表已关闭或群聊已切换');
         const s=await sessions.get(sender.tab.id,false);
         if(message.accountId!==s.accountId)throw new Error('登录账号已切换');
         const state=await repository.load(s.accountId);
-        if(message.action==='POSTS_REPLY'){const result=await postInteractions.reply(s,message,state,checkpoint);respond({ok:true,...result});return;}
+        if(message.action==='POSTS_REPLY'||timeline){const result=await postInteractions.reply(s,{...message,timeline},state,checkpoint);respond({ok:true,...result});return;}
         const data=message.action==='POSTS_LIKE'?await postInteractions.like(s,message,state,checkpoint):await postInteractions.read(s,message.username,Boolean(message.refresh));
         let changed=false;
         for(const post of data.posts){const intent=state.postLikeIntents?.[post.id];if(intent&&intent.liked===post.liked){delete state.postLikeIntents[post.id];changed=true;}else if(intent)post.unconfirmed=true;}

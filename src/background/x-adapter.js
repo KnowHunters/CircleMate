@@ -1,4 +1,5 @@
 import {nativeReplyRequest} from './reply-request.js';
+import {timelineTargetInPage} from './timeline-target.js';
 import {parseRecentPosts} from './recent-posts.js';
 import { normalizeUser } from "./domain.js";
 import { ANALYTICS_PARSER_VERSION } from './analytics-schema.js';
@@ -27,6 +28,11 @@ export function parseUserPage(payload) {
   return { users, cursor: terminated ? null : bottom, complete: terminated, source: "graphql" };
 }
 export class XWebAdapter {
+  async assertTimelineTarget(s, message) {
+    await this.sessions.assertCurrent(s);
+    const frames = await this.chrome.scripting.executeScript({target:{tabId:s.tabId,frameIds:[0]},world:'MAIN',func:timelineTargetInPage,args:[{origin:s.origin,tweetId:message.tweetId,username:message.username}]});
+    if (frames[0]?.result !== true) throw new ApiError('帖子已移出当前时间线，请重新展开回复框','WRITE_NOT_SENT');
+  }
   async recentPosts(s, user) {
     const record=this.registry.records.UserOriginalsTimeline;
     if(!record)throw new ApiError('请打开原生帖子页后重试','ENDPOINT_MISSING');

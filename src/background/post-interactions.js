@@ -22,10 +22,15 @@ export class PostInteractions {
     const existing=state.replyIntents[message.tweetId];
     if(existing?.status==='complete'&&existing.token===message.token)return {confirmed:true,replyId:existing.replyId};
     if(existing&&existing.status!=='complete')throw new Error('上次回复结果未确认，请到原帖核验，避免重复发送');
-    const data=await this.read(s,message.username,true);if(!data.posts.some(p=>p.id===message.tweetId&&!p.limited))throw Object.assign(new Error('帖子当前不能回复，请使用原生回复框'),{code:'WRITE_NOT_SENT'});
+    if(message.timeline){
+      if(!/^[a-z0-9_]{1,15}$/i.test(message.username||''))throw Object.assign(new Error('帖子作者无效'),{code:'WRITE_NOT_SENT'});
+      await this.adapter.assertTimelineTarget(s,message);
+    }else{
+      const data=await this.read(s,message.username,true);if(!data.posts.some(p=>p.id===message.tweetId&&!p.limited))throw Object.assign(new Error('帖子当前不能回复，请查看原帖'),{code:'WRITE_NOT_SENT'});
+    }
     if(Object.keys(state.replyIntents).length>=100&&!existing){const oldest=Object.keys(state.replyIntents).find(id=>state.replyIntents[id].status==='complete');if(oldest)delete state.replyIntents[oldest];else throw Object.assign(new Error('待核验回复过多'),{code:'WRITE_NOT_SENT'});}
     state.replyIntents[message.tweetId]={token:message.token,status:'running',at:this.now()};await checkpoint(s,state);
-    try{const result=await this.adapter.reply(s,message.tweetId,message.text);state.replyIntents[message.tweetId]={token:message.token,status:'complete',replyId:result.replyId,at:this.now()};await checkpoint(s,state);this.cache.delete(s.accountId+':'+data.username);return result;}catch(error){if(error.code==='WRITE_NOT_SENT'){delete state.replyIntents[message.tweetId];await checkpoint(s,state);}throw error;}
+    try{const result=await this.adapter.reply(s,message.tweetId,message.text);state.replyIntents[message.tweetId]={token:message.token,status:'complete',replyId:result.replyId,at:this.now()};await checkpoint(s,state);this.cache.delete(s.accountId+':'+message.username.toLowerCase());return result;}catch(error){if(error.code==='WRITE_NOT_SENT'){delete state.replyIntents[message.tweetId];await checkpoint(s,state);}throw error;}
   }
   async like(s,message,state,checkpoint){
     if(message.accountId!==s.accountId||typeof message.liked!=='boolean'||!/^\d{1,30}$/.test(message.tweetId||''))throw new Error('操作参数或登录账号不匹配');
