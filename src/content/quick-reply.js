@@ -9,7 +9,9 @@
   function hide(){if(!active)return;active.view.element.remove();active.button.setAttribute('aria-expanded','false');active=null;}
   function open(article,button){
     const post=target(article),accountId=account();if(!isProfile()||!post||!/^\d{1,30}$/.test(accountId))return;
-    if(active?.view.element.getAttribute('aria-busy')==='true'||(active?.article===article&&active.tweetId===post.tweetId)){active.view.focus();return;}hide();const route=location.pathname;
+    if(active?.view.element.getAttribute('aria-busy')==='true'){active.view.focus();return;}
+    if(active?.article===article&&active.tweetId===post.tweetId){hide();button.focus({preventScroll:true});return;}
+    hide();const route=location.pathname;
     const valid=()=>article.isConnected&&isProfile()&&location.pathname===route&&account()===accountId&&target(article)?.tweetId===post.tweetId;
     const view=api.createInlineReply({accountId,...post,onClose:()=>{hide();button.focus({preventScroll:true});},onSend:async(text,token)=>{
       if(!valid())throw Object.assign(new Error('帖子或账号已切换，请重新展开回复框'),{code:'WRITE_NOT_SENT'});
