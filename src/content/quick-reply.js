@@ -20,7 +20,7 @@
     button.closest('[role=group]').parentElement.append(view.element);active={article,button,view,tweetId:post.tweetId,accountId,route};button.setAttribute('aria-expanded','true');view.element.scrollIntoView({block:'nearest'});view.focus();
   }
   const style = document.createElement('style');
-  style.textContent = '.cm-quick-reply{flex:0 0 auto;margin:0;cursor:pointer}.cm-quick-reply:hover{color:rgb(29,155,240)!important}.cm-quick-reply:hover>div{background:rgba(29,155,240,.1);border-radius:50%}.cm-quick-reply:focus-visible{outline:2px solid rgb(29,155,240);outline-offset:2px}.cm-quick-reply:disabled{opacity:.4;cursor:default}.cm-quick-reply svg{fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}';
+  style.textContent = '.cm-quick-reply{flex:0 0 auto;margin:0 0 0 12px;padding:0;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--cm-icon-color)!important}.cm-quick-reply:hover,.cm-quick-reply[aria-expanded=true]{color:rgb(29,155,240)!important}.cm-quick-reply:hover{background:rgba(29,155,240,.1);border-radius:50%}.cm-quick-reply:focus-visible{outline:2px solid rgb(29,155,240);outline-offset:2px}.cm-quick-reply:disabled{opacity:.4;cursor:default}.cm-quick-reply svg{fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;color:inherit}';
   document.head.append(style);
   style.textContent+=api.inlineReplyCss+'.cm-quick-reply[aria-expanded=true]{color:rgb(29,155,240)!important}.cm-timeline-reply{margin:12px 0 8px;--cm-muted:#536471;--cm-line:#cfd9de88}.cm-timeline-reply[data-dark=true]{--cm-muted:#a0adb8;--cm-line:#53647188}';
   function update(article) {
@@ -32,9 +32,18 @@
       existing?.remove();if(active?.article===article)hide();return;
     }
     if(active?.article===article&&active.tweetId!==post.tweetId)hide();
-    if (existing) { existing.disabled=reply.disabled||reply.getAttribute('aria-disabled')==='true';return; }
     const nativeIcon = reply.querySelector('svg');
     if (!nativeIcon) return;
+    const nativeStyle=getComputedStyle(nativeIcon),size=nativeIcon.getBoundingClientRect();
+    function syncAppearance(button){
+      button.style.setProperty('--cm-icon-color',nativeStyle.color);
+      const hitSize=Math.max(32,reply.getBoundingClientRect().height);
+      button.style.width=button.style.height=hitSize+'px';
+      const icon=button.querySelector('svg');
+      if(icon){icon.style.width=(size.width||18)+'px';icon.style.height=(size.height||18)+'px';}
+      button.disabled=reply.disabled||reply.getAttribute('aria-disabled')==='true';
+    }
+    if (existing) {syncAppearance(existing);return;}
     const button = reply.cloneNode(false);
     button.removeAttribute('data-testid'); button.removeAttribute('id');
     button.removeAttribute('aria-describedby');button.removeAttribute('aria-pressed');button.setAttribute('aria-expanded','false');
@@ -47,6 +56,7 @@
     icon.setAttribute('viewBox', '0 0 24 24'); icon.setAttribute('aria-hidden', 'true');
     icon.innerHTML = '<path d="M14 5H5a2 2 0 0 0-2 2v11l4-3h8a2 2 0 0 0 2-2v-1M13 9l7-7 2 2-7 7-3 1z"/>';
     button.append(iconContainer);
+    syncAppearance(button);
     button.addEventListener('click', event => {
       event.preventDefault(); event.stopPropagation();
       if (!event.isTrusted || !isProfile() || button.disabled) return;
