@@ -1,4 +1,5 @@
 import {PostInteractions} from './post-interactions.js';
+import {syncNotifications} from './member-interactions.js';
 import '../shared/timeline-context.js';
 import { AccountRepository } from "./repository.js";
 import { SessionProvider } from "./session.js";
@@ -58,6 +59,7 @@ function scheduleSync(tabId) {
       const state = await repository.load(session.accountId);
       const nativeChanged=await services.GET_STATE(session,state);
       await autoSync({ session, state, services, checkpoint, maxJobs: 1,forceCheckpoint:nativeChanged });
+      await syncNotifications(session,state,adapter,checkpoint);
     } catch { /* Closed tabs, logout or account switch stop the pass. */ }
     finally { pendingTabs.delete(tabId); }
   };
@@ -124,6 +126,17 @@ chrome.runtime.onMessage.addListener((message, sender, respond) => {
   }
   if (sender.id === chrome.runtime.id && sender.tab && message?.action === "FRAME_CONTEXT") {
     chrome.tabs.get(sender.tab.id).then(tab => respond(chatContext(tab.url)), () => respond(null)); return true;
+  }
+  if(sender.id===chrome.runtime.id && sender.tab && message?.action==='ROSTER_INTERACTIONS'){
+    void scheduler.add(async()=>{try{
+      await ready;const context=chatContext((await chrome.tabs.get(sender.tab.id)).url);
+      if(!context?.isInfo||context.groupId!==message.groupId)throw new Error('群聊已切换');
+      const s=await sessions.get(sender.tab.id,false);
+      if(s.accountId!==message.accountId)throw new Error('账号已切换');
+      const state=await repository.load(s.accountId);
+      await syncNotifications(s,state,adapter,checkpoint,{force:true});
+      respond({ok:true,state:projectAccount(state)});
+    }catch(error){respond({ok:false,error:error.message});}},-1).catch(error=>respond({ok:false,error:error.message}));return true;
   }
   if(sender.id===chrome.runtime.id && sender.tab && sender.frameId===0 && ['POSTS_READ','POSTS_LIKE','POSTS_REPLY','TIMELINE_REPLY'].includes(message?.action)){
     void scheduler.add(async()=>{

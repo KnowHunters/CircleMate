@@ -4,10 +4,10 @@ import { EndpointRegistry } from '../src/background/endpoint-registry.js';
 import { bundledEndpoints } from '../src/background/bundled-endpoints.js';
 import { XWebAdapter } from '../src/background/x-adapter.js';
 const storage = value=>({async get(){return {circlemate_endpoints_v1:value};}});
-test('fresh installation includes all eight verified endpoints without page visits',async()=>{
+test('fresh installation includes all nine verified endpoints without page visits',async()=>{
   const registry=new EndpointRegistry(storage());await registry.load();
-  for(const kind of ['following','followers','verifiedFollowers','profile','posts','replies','reposts','analytics'])assert.ok(registry.find(kind));
-  assert.equal(Object.keys(registry.records).length,8);
+  for(const kind of ['following','followers','verifiedFollowers','profile','posts','replies','reposts','analytics','notifications'])assert.ok(registry.find(kind));
+  assert.equal(Object.keys(registry.records).length,9);
   assert.equal(Object.keys(registry.find('posts').features).length,40);
   assert.equal(registry.find('profile').defaults.withGrokTranslatedBio,true);
   assert.equal(registry.find('replies').defaults.withCommunity,true);

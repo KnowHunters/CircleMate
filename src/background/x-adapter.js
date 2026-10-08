@@ -28,6 +28,11 @@ export function parseUserPage(payload) {
   return { users, cursor: terminated ? null : bottom, complete: terminated, source: "graphql" };
 }
 export class XWebAdapter {
+  async notifications(s,cursor){
+    const record=this.registry.records.NotificationsTimeline;
+    if(!record)throw new ApiError('请打开 X 原生通知页后重试','ENDPOINT_MISSING');
+    return this.graphql(s,record,{timeline_type:'All',count:record.defaults?.count||20,...(cursor?{cursor}:{})});
+  }
   async assertTimelineTarget(s, message) {
     await this.sessions.assertCurrent(s);
     const frames = await this.chrome.scripting.executeScript({target:{tabId:s.tabId,frameIds:[0]},world:'MAIN',func:timelineTargetInPage,args:[{origin:s.origin,tweetId:message.tweetId,username:message.username}]});

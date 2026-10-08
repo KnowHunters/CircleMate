@@ -1,3 +1,4 @@
+import {notificationEndpoint} from './notification-endpoint.js';
 // Public X web query configuration captured from native HTTP 200 requests.
 // No account IDs, cookies, authorization headers or pagination cursors.
 const timelineFeatures = Object.fromEntries([
@@ -46,4 +47,5 @@ const records = [
   record('accountOverviewDailyQuery','2hqAR3h2xhN1cUrUBZypyg',{show_realtime_active_followers:true,show_verified_followers:true},{})
 ];
 export function bundledEndpoints() { const result=structuredClone(Object.fromEntries(records.map(r=>[r.operation,r])));
+  result.NotificationsTimeline=structuredClone(notificationEndpoint);
   Object.assign(result.UserOriginalsTimeline,{observedAt:1791342657000,lastResponseAt:1791342657000,verifiedOn:'2026-10-07'});return result; }

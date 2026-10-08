@@ -1,3 +1,4 @@
+import {interactionProjection} from './member-interactions.js';
 export const SCHEMA_VERSION = 4;
 export const LIST_KINDS = ["following", "followers", "verifiedFollowers"];
 export const validId = id => /^\d{1,30}$/.test(String(id || ""));
@@ -98,7 +99,7 @@ export function projectAccount(state) {
   return { schemaVersion: SCHEMA_VERSION, accountId: state.accountId, account: state.account,
     groups: Object.values(state.groups).sort((a,b) => b.lastSeen - a.lastSeen).map(g => ({ ...g, retryAt: Math.max(g.retryAt || 0,state.profileRetryAt || 0), users: groupUsers(state, g, context) })),
     relationships, followBack: followBackUsers(state,context), relationshipChanges: Object.fromEntries(Object.entries(state.lists).filter(([, list]) => !list.stale).map(([kind, list]) => [kind, list.changes])),
-    creatorLibrary:state.creatorLibrary || {posts:[]}, creator: state.creator, analytics: state.analytics || null, autoSync: state.autoSync || null, nativePage: state.nativePage || null, tasks: state.tasks,
+    memberInteractions:interactionProjection(state.memberInteractions), creatorLibrary:state.creatorLibrary || {posts:[]}, creator: state.creator, analytics: state.analytics || null, autoSync: state.autoSync || null, nativePage: state.nativePage || null, tasks: state.tasks,
     revision:state.revision||0,capabilities: state.capabilities || {unfollow:false},writeQueue: state.writeQueue || { jobs: [], paused: false, nextAt: 0 }, updatedAt: state.updatedAt };
 }
 export function followBackUsers(state,context=relationContext(state)){

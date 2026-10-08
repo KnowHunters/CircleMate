@@ -17,6 +17,13 @@ export function validateBackup(input, accountId) {
   if(!input||JSON.stringify(input).length>8*1024*1024)throw new Error('备份文件无效或超过 8 MB');
   const state=migrateAccount(input,accountId);
   validateCreatorLibrary(state.creatorLibrary);
+  if(state.memberInteractions){
+    const cache=state.memberInteractions;
+    if(!cache.events||Array.isArray(cache.events)||Object.keys(cache.events).length>5000)throw new Error('备份互动记录格式无效');
+    for(const [key,e]of Object.entries(cache.events))if(!e||!['like','reply'].includes(e.type)||!/^\d{1,30}$/.test(e.userId||'')||!/^\d{1,30}$/.test(e.postId||'')||e.key!==key||key!==(e.type==='like'?`like:${e.userId}:${e.postId}`:`reply:${e.replyId}`)||e.type==='reply'&&!/^\d{1,30}$/.test(e.replyId||'')||!Number.isFinite(e.observedAt)||e.at!=null&&!Number.isFinite(e.at))throw new Error('备份互动事件无效');
+    // Imported cursors are not request instructions; resume from the native head.
+    cache.cursor=null;cache.seen=[];cache.pages=0;cache.status='idle';cache.nextAt=0;cache.retryAt=null;cache.lastAttemptAt=0;
+  }
   if(state.replyIntents && (typeof state.replyIntents!=='object'||Array.isArray(state.replyIntents)||Object.keys(state.replyIntents).length>100))throw new Error('备份回复操作格式无效');
   for(const [id,intent]of Object.entries(state.replyIntents||{}))if(!/^\d{1,30}$/.test(id)||!/^[a-z0-9_-]{10,80}$/i.test(intent?.token||'')||!['running','complete'].includes(intent.status)||!Number.isFinite(intent.at)||(intent.status==='complete'&&!/^\d{1,30}$/.test(intent.replyId||'')))throw new Error('备份回复操作格式无效');
   if(state.postLikeIntents && (Array.isArray(state.postLikeIntents)||Object.keys(state.postLikeIntents).length>100))throw new Error('备份帖子操作格式无效');

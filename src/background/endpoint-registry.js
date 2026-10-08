@@ -2,7 +2,7 @@ import { bundledEndpoints } from "./bundled-endpoints.js";
 import { verifiedDestroy } from './verified-writes.js';
 // Replay verified bundled or observed GET operations; never persist full URLs or headers.
 export const OPERATIONS = Object.freeze({
-  Following: "following", Followers: "followers", BlueVerifiedFollowers: "verifiedFollowers",
+  NotificationsTimeline:"notifications", Following: "following", Followers: "followers", BlueVerifiedFollowers: "verifiedFollowers",
   VerifiedFollowers: "verifiedFollowers", UserByRestId: "account", UserByScreenName: "profile",
   UserOriginalsTimeline: "posts", UserRepliesTimeline: "replies", UserRepostsTimeline: "reposts",
   UsersByRestIds: "users", accountOverviewDailyQuery: "analytics",

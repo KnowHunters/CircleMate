@@ -25,7 +25,7 @@
       dialog.append(title,text,actions);dialog.oncancel=event=>{event.preventDefault();finish(false);};(root===document?document.body:root).append(dialog);dialog.showModal();
     });
   }
-  function clear(){for(const root of api.rosterRoots()){root.querySelectorAll('.cm-roster-hidden').forEach(e=>e.classList.remove('cm-roster-hidden'));root.querySelectorAll('.cm-roster-action,.cm-roster-toolbar,.cm-roster-time').forEach(e=>e.remove());}state=null;groupId='';mode='all';blueOnly=true;lastReferences='';lastBatch=0;error='';feedback=null;}
+  function clear(){for(const root of api.rosterRoots()){root.querySelectorAll('.cm-roster-hidden').forEach(e=>e.classList.remove('cm-roster-hidden'));root.querySelectorAll('.cm-roster-action,.cm-roster-toolbar,.cm-roster-time,.cm-roster-interaction').forEach(e=>e.remove());}state=null;groupId='';mode='all';blueOnly=true;lastReferences='';lastBatch=0;error='';feedback=null;}
   async function queueControl(command){try{const result=await send('QUEUE_CONTROL',{accountId:state?.accountId,command});if(result?.state)adopt(result.state);if(!result?.ok)notify(result?.error||'队列操作失败',true);render();}catch(e){notify(e.message,true);}}
   async function enrich(retryFailed=false){
     if(enrichBusy||state?.groups?.find(g=>g.id===groupId)?.retryAt>Date.now())return;
@@ -43,9 +43,9 @@
   }
   function render(){
     for(const root of api.rosterRoots()){
-      if(!observed.has(root)){new MutationObserver(records=>{if(records.every(r=>r.target.closest?.('.cm-roster-action,.cm-roster-toolbar,.cm-roster-time') || r.type==='childList' && [...r.addedNodes,...r.removedNodes].length && [...r.addedNodes,...r.removedNodes].every(n=>n.nodeType===1&&n.matches?.('.cm-roster-action,.cm-roster-toolbar,.cm-roster-time'))))return;if(updateTimer!==null)return;updateTimer=setTimeout(()=>{updateTimer=null;void update();},250);}).observe(root,{childList:true,subtree:true,attributes:true,attributeFilter:['href','aria-label']});observed.add(root);}
+      if(!observed.has(root)){new MutationObserver(records=>{if(records.every(r=>r.target.closest?.('.cm-roster-action,.cm-roster-toolbar,.cm-roster-time,.cm-roster-interaction') || r.type==='childList' && [...r.addedNodes,...r.removedNodes].length && [...r.addedNodes,...r.removedNodes].every(n=>n.nodeType===1&&n.matches?.('.cm-roster-action,.cm-roster-toolbar,.cm-roster-time,.cm-roster-interaction'))))return;if(updateTimer!==null)return;updateTimer=setTimeout(()=>{updateTimer=null;void update();},250);}).observe(root,{childList:true,subtree:true,attributes:true,attributeFilter:['href','aria-label']});observed.add(root);}
       const scope=api.rosterListScope(root),rows=api.rosterListRows(root),allowed=new Set(rows.map(r=>r.row));
-      for(const {row} of api.rosterRows(root))if(!allowed.has(row)){row.classList.remove('cm-roster-hidden');row.querySelector('.cm-roster-action')?.remove();}
+      for(const {row} of api.rosterRows(root))if(!allowed.has(row)){row.classList.remove('cm-roster-hidden');row.querySelectorAll('.cm-roster-action,.cm-roster-interaction,.cm-roster-time').forEach(e=>e.remove());}
       const oldBar=root.querySelector('.cm-roster-toolbar');if(oldBar&&(!scope||!scope.contains(oldBar)))oldBar.remove();
       if(!rows.length)continue;
       if(!root.querySelector('[data-cm-roster-style]')){const sheet=document.createElement('style');sheet.dataset.cmRosterStyle='1';sheet.textContent=style;(root===document?document.head:root).append(sheet);}
@@ -53,6 +53,7 @@
         for(const [value,label] of [['all','全部'],['unfollowed','未关注'],['unmatched','未回关'],['unavailable','异常']]){const b=document.createElement('button');b.type='button';b.textContent=label;b.dataset.mode=value;b.onclick=()=>{mode=value;render();};bar.append(b);}
         const blueLabel=document.createElement('label');blueLabel.className='cm-roster-blue';const blueCheck=document.createElement('input');blueCheck.type='checkbox';blueCheck.setAttribute('aria-label','蓝V');blueCheck.dataset.blue='1';blueCheck.onchange=()=>{blueOnly=blueCheck.checked;render();};blueLabel.append(blueCheck,document.createTextNode('蓝V'));bar.append(blueLabel);
         const next=document.createElement('button');next.type='button';next.textContent='识别下一批';next.dataset.enrich='1';next.onclick=()=>void enrich(true);bar.append(next);
+        const sync=document.createElement('button');sync.type='button';sync.textContent='同步互动';sync.dataset.interactions='1';sync.onclick=async()=>{const accountId=state?.accountId,originGroup=groupId;sync.disabled=true;try{const result=await send('ROSTER_INTERACTIONS',{accountId});if(state?.accountId===accountId&&groupId===originGroup){if(result?.state)adopt(result.state);if(!result?.ok)notify(result?.error||'互动同步失败',true);render();}}catch(e){notify(e.message,true);}finally{sync.disabled=false;}};bar.append(sync);
         const pause=document.createElement('button');pause.type='button';pause.dataset.queuePause='1';pause.onclick=()=>void queueControl(followPaused?'resume':'pause');bar.append(pause);
         const cancel=document.createElement('button');cancel.type='button';cancel.dataset.queueCancel='1';cancel.textContent='取消执行';cancel.onclick=()=>{
           void queueControl('cancel');
@@ -64,6 +65,12 @@
         if(branch && (branch.parentElement===scope || branch.parentNode===scope))branch.before(bar);else scope.prepend(bar);
       }
       const group=state?.groups?.find(g=>g.id===groupId);
+      const interactions=state?.memberInteractions;
+      const interactionSync=bar.querySelector('[data-interactions]');interactionSync.disabled=interactions?.status==='syncing'||interactions?.retryAt>Date.now();interactionSync.title=interactions?.error||'按账号同步通知，与群成员在本地匹配';
+      let interactionNote=bar.querySelector('.cm-roster-interaction-note');if(!interactionNote){interactionNote=document.createElement('span');interactionNote.className='cm-roster-note cm-roster-interaction-note';bar.append(interactionNote);}
+      const interactionStatus=interactions?.retryAt>Date.now()?`冷却 ${Math.ceil((interactions.retryAt-Date.now())/1000)} 秒`:interactions?.status==='syncing'?'同步中':interactions?.status==='pending'?'等待续传':interactions?.error?'同步失败':'已缓存';
+      interactionNote.textContent=interactions?.updatedAt?`互动${interactionStatus} · 部分通知记录 · 更新于 ${new Date(interactions.updatedAt).toLocaleString('zh-CN',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'})}`:`互动${interactionStatus} · 尚未采集记录`;
+      interactionNote.title=interactions?.error||'显示对方点赞或评论你的已采集记录，不代表完整历史；点赞时间为通知时间。';
       const lastFailure=state?.writeQueue?.jobs?.filter(j=>j.groupId===groupId&&j.error&&['failed','unconfirmed'].includes(j.status)).at(-1);
       if(lastFailure && Date.now()-lastFailure.updatedAt<10000)feedback={text:'@'+lastFailure.username+'：'+lastFailure.error.message,failed:true,until:lastFailure.updatedAt+10000};
       const users=api.rosterCachedUsers(state,group);let pending=0,unknown=0,remaining=0,failed=0,matched=0,unmatched=0,selfCount=0;
@@ -77,6 +84,11 @@
         row.classList.toggle('cm-roster-hidden',!matches||(unavailable&&mode!=='unavailable'));
         let button=row.querySelector('.cm-roster-action');if(!button){button=document.createElement('button');button.type='button';button.className='cm-roster-action';if(menu)menu.before(button);else row.append(button);}
         button.dataset.relation=relation;button.textContent=unavailable?'账号不可用':({unfollowed:'关注',following:user?.followedBy===false?'未回关':user?.followedBy===true?'互关':'已关注',requested:'已请求',self:'自己',unknown:'待识别'})[relation];if(relation==='unknown'&&(!state||enrichBusy)&&!error)button.textContent='识别中…';if(user&&pendingFollows.has(username))button.textContent='提交中…';button.disabled=relation!=='unfollowed'||Boolean(user&&pendingFollows.has(username))||unavailable;
+        let interaction=row.querySelector('.cm-roster-interaction');if(!interaction){interaction=document.createElement('span');interaction.className='cm-roster-interaction';interaction.style.cssText='font:11px system-ui;color:#63717c;margin-left:auto;margin-right:8px;white-space:nowrap';button.before(interaction);}
+        const metrics=interactions?.members?.[user?.id];
+        interaction.textContent=metrics?[metrics.likes?`点赞 ${metrics.likes}`:'',metrics.replies?`评论 ${metrics.replies}`:''].filter(Boolean).join(' · '):'暂无记录';
+        interaction.title='对方与你的已采集互动；未匹配到记录不等于没有互动。';
+        button.style.marginLeft='0';
         if(button.getAttribute('aria-label')!==button.textContent+' @'+username)button.setAttribute('aria-label',button.textContent+' @'+username);
         const queuedFollow=api.rosterQueuedFollow(followOrder,username,state?.accountId,followRetryAt,Date.now(),followPaused&&activeFollow?.username!==username);
         if(queuedFollow){button.textContent=queuedFollow.label;if(activeFollow?.username===username)button.textContent=activeFollow.action==='UNFOLLOW'?'取关中…':'关注中…';else if(!followPaused&&followRetryAt<=Date.now())button.textContent='排队中…';button.disabled=true;button.dataset.relation='queued';button.title='操作队列第 '+queuedFollow.position+' 位';button.setAttribute('aria-label',button.textContent+' @'+username);}
@@ -90,7 +102,7 @@
         }
         let time=row.querySelector('.cm-roster-time');
         if(relation==='following'){
-          if(!time){time=document.createElement('span');time.className='cm-roster-time';time.style.cssText='font:11px system-ui;color:#63717c;margin-left:auto;margin-right:8px;white-space:nowrap';button.before(time);}
+          if(!time){time=document.createElement('span');time.className='cm-roster-time';time.style.cssText='font:11px system-ui;color:#63717c;margin-right:8px;white-space:nowrap';button.before(time);}
           const timing=api.rosterFollowTime(user);time.textContent=timing.label;time.title=timing.title;
           button.style.marginLeft='0';
           if(mode==='all'){
