@@ -107,7 +107,7 @@
           const timing=api.rosterFollowTime(user);time.textContent=timing.label;time.title=timing.title;
           time.style.marginLeft=showInteraction?'0':'auto';
           button.style.marginLeft='0';
-          if(mode==='all'){
+          if(mode==='all'||mode==='interacted'){
             if(!queuedFollow){button.textContent='已关注';button.title='已关注';button.disabled=true;button.setAttribute('aria-label','已关注 @'+username);}
             button.onclick=null;
             continue;
