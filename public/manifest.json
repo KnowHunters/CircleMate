@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "CircleMate",
-  "version": "0.5.32",
+  "version": "0.5.33",
   "description": "A local-first X relationship organizer for new users.",
   "permissions": [
     "storage",
