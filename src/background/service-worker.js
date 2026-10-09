@@ -1,5 +1,6 @@
 import {PostInteractions} from './post-interactions.js';
 import {syncNotifications} from './member-interactions.js';
+import {syncGroupReviews,reviewProjection} from './group-reviews.js';
 import '../shared/timeline-context.js';
 import { AccountRepository } from "./repository.js";
 import { SessionProvider } from "./session.js";
@@ -21,6 +22,17 @@ const adapter = new XWebAdapter({ fetch: globalThis.fetch.bind(globalThis), sess
 const services = createServices({ adapter, checkpoint });
 const postInteractions=new PostInteractions(adapter);
 const pendingTabs = new Set();
+const reviewTabs=new Map(),pendingReviews=new Set();
+function scheduleReviews(tabId,ids){
+  reviewTabs.set(tabId,ids);if(pendingReviews.has(tabId))return;
+  pendingReviews.add(tabId);
+  void scheduler.add(async()=>{
+    try{const tab=await chrome.tabs.get(tabId);if(!/^https:\/\/x\.com\/i\/chat(?:\/|$)/.test(tab.url))return;
+      const session=await sessions.get(tabId,false),state=await repository.load(session.accountId);
+      await syncGroupReviews(session,state,adapter,checkpoint,reviewTabs.get(tabId)||[]);
+    }catch{}finally{pendingReviews.delete(tabId);}
+  },-1).catch(()=>pendingReviews.delete(tabId));
+}
 const nativeWrites=new Map();
 chrome.webRequest.onBeforeRequest?.addListener(details=>{
   const id=details.requestBody?.formData?.user_id?.[0];
@@ -66,6 +78,7 @@ function scheduleSync(tabId) {
   void scheduler.add(async()=>{await ready;await run();}, -1).catch(()=>{});
 }
 async function syncOpenTabs() {
+  for(const [tabId,ids] of reviewTabs)scheduleReviews(tabId,ids);
   try { for (const tab of await chrome.tabs.query({ url: ['https://x.com/*','https://twitter.com/*'] })) { scheduleSync(tab.id); wakeWrites(tab.id); } } catch {}
 }
 const writeTimers=new Map();
@@ -93,6 +106,7 @@ chrome.webRequest.onBeforeSendHeaders.addListener(details => {
   void ready.then(() => registry.observe(details)).catch(() => {});
 }, { urls: ["https://x.com/i/api/*", "https://twitter.com/i/api/*"] }, ["requestHeaders"]);
 chrome.tabs.onRemoved.addListener(tabId => {
+  reviewTabs.delete(tabId);
   sessions.tokens.delete(tabId);
   if(writeTimers.has(tabId)){clearTimeout(writeTimers.get(tabId));writeTimers.delete(tabId);}
   void chrome.alarms?.clear('circlemate-write-queue-'+tabId);
@@ -104,6 +118,15 @@ chrome.webRequest.onCompleted.addListener(details => {
   void ready.then(async () => { if (registry.completed(details)) await registry.save(); }).catch(() => {});
 }, { urls: ["https://x.com/i/api/graphql/*", "https://twitter.com/i/api/graphql/*",'https://x.com/i/api/1.1/friendships/*.json','https://twitter.com/i/api/1.1/friendships/*.json'] });
 chrome.runtime.onMessage.addListener((message, sender, respond) => {
+  if(sender.id===chrome.runtime.id&&sender.tab&&sender.frameId===0&&message?.action==='GROUP_REVIEWS'){
+    void(async()=>{try{
+      const tab=await chrome.tabs.get(sender.tab.id);if(!/^https:\/\/x\.com\/i\/chat(?:\/|$)/.test(tab.url))throw Error('聊天列表已关闭');
+      if(!Array.isArray(message.groupIds)||message.groupIds.length>20||message.groupIds.some(id=>typeof id!=='string'||!/^g\d{1,30}$/.test(id)))throw Error('群列表参数无效');
+      const session=await sessions.get(sender.tab.id,false),state=await repository.load(session.accountId);
+      respond({ok:true,accountId:session.accountId,reviews:reviewProjection(state.groupReviews,message.groupIds)});
+      scheduleReviews(session.tabId,message.groupIds);
+    }catch(error){respond({ok:false,error:error.message});}})();return true;
+  }
   // Extension-owned iframe UI keeps the identity and cookie store of its hosting tab.
   if(sender.id===chrome.runtime.id && sender.tab && typeof sender.url==='string') {
     try { const url=new URL(sender.url);

@@ -1,4 +1,5 @@
 import {nativeReplyRequest} from './reply-request.js';
+import {readGroupReviewInPage} from './group-reviews.js';
 import {timelineTargetInPage} from './timeline-target.js';
 import {parseRecentPosts} from './recent-posts.js';
 import { normalizeUser } from "./domain.js";
@@ -28,6 +29,13 @@ export function parseUserPage(payload) {
   return { users, cursor: terminated ? null : bottom, complete: terminated, source: "graphql" };
 }
 export class XWebAdapter {
+  async groupReview(s,groupId){
+    await this.sessions.assertCurrent(s);
+    const frames=await this.chrome.scripting.executeScript({target:{tabId:s.tabId,frameIds:[0]},world:'MAIN',func:readGroupReviewInPage,args:[{origin:s.origin,accountId:s.accountId,authorization:s.authorization,groupId}]});
+    const result=frames[0]?.result;
+    if(!result||result.error)throw new ApiError(result?.error||'审核同步失败',result?.code||'PAGE_REQUEST_FAILED',result?.retryAt);
+    await this.sessions.assertCurrent(s);return result;
+  }
   async notifications(s,cursor){
     const record=this.registry.records.NotificationsTimeline;
     if(!record)throw new ApiError('请打开 X 原生通知页后重试','ENDPOINT_MISSING');

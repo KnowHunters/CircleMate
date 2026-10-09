@@ -17,6 +17,14 @@ export function validateBackup(input, accountId) {
   if(!input||JSON.stringify(input).length>8*1024*1024)throw new Error('备份文件无效或超过 8 MB');
   const state=migrateAccount(input,accountId);
   validateCreatorLibrary(state.creatorLibrary);
+  if(state.groupReviews){
+    if(typeof state.groupReviews!=='object'||Array.isArray(state.groupReviews)||Object.keys(state.groupReviews).length>200)throw new Error('备份群审核缓存无效');
+    for(const [id,record]of Object.entries(state.groupReviews)){
+      if(!/^g\d{1,30}$/.test(id)||!record||record.count!=null&&(!Number.isSafeInteger(record.count)||record.count<0)||record.updatedAt!=null&&!Number.isFinite(record.updatedAt))throw new Error('备份群审核数量无效');
+      record.nextAt=0;record.status='error';record.error='恢复的缓存，等待重新同步';
+    }
+    state.groupReviewRetryAt=0;
+  }
   if(state.memberInteractions){
     const cache=state.memberInteractions;
     if(!cache.events||Array.isArray(cache.events)||Object.keys(cache.events).length>5000)throw new Error('备份互动记录格式无效');
