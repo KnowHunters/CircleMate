@@ -1,5 +1,20 @@
 import test from 'node:test';import assert from 'node:assert/strict';import vm from 'node:vm';import {readFile} from 'node:fs/promises';
 const source=await readFile(new URL('../src/shared/roster.js',import.meta.url),'utf8');
+test('follow-back labels require confirmed follower relation and priority restores native styles',()=>{
+ const context={};vm.runInNewContext(source,context);const api=context.CircleMate;
+ assert.equal(api.rosterFollowLabel({followedBy:true}),'回关');
+ for(const followedBy of [false,null,undefined])assert.equal(api.rosterFollowLabel({followedBy}),'关注');
+ const parent={style:{display:'block',flexDirection:'',},children:[]};
+ const normal={parentElement:parent,style:{order:''}},back={parentElement:parent,style:{order:'3'}};
+ parent.children=[normal,back];const rows=[{row:normal,back:false},{row:back,back:true}];
+ api.rosterPrioritizeFollowBack(rows,true,e=>e.back);
+ assert.equal(back.style.order,'0');assert.equal(normal.style.order,'1');assert.equal(parent.style.flexDirection,'column');
+ assert.deepEqual(parent.children,[normal,back]);
+ api.rosterPrioritizeFollowBack(rows,false);
+ assert.equal(parent.style.display,'block');assert.equal(parent.style.flexDirection,'');assert.equal(back.style.order,'3');assert.equal(normal.style.order,'');
+ parent.children.push({});api.rosterPrioritizeFollowBack(rows,true,e=>e.back);
+ assert.equal(parent.style.display,'block');
+});
 test('interaction filter honors known events, blue filter and excludes self or unavailable members',()=>{
  const context={document:{querySelectorAll:()=>[]}};vm.runInNewContext(source,context);
  const match=context.CircleMate.rosterMatches,user={id:'2',following:true,blueVerified:true};

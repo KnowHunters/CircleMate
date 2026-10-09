@@ -25,7 +25,7 @@
       dialog.append(title,text,actions);dialog.oncancel=event=>{event.preventDefault();finish(false);};(root===document?document.body:root).append(dialog);dialog.showModal();
     });
   }
-  function clear(){for(const root of api.rosterRoots()){root.querySelectorAll('.cm-roster-hidden').forEach(e=>e.classList.remove('cm-roster-hidden'));root.querySelectorAll('.cm-roster-action,.cm-roster-toolbar,.cm-roster-time,.cm-roster-interaction').forEach(e=>e.remove());}state=null;groupId='';mode='all';blueOnly=true;lastReferences='';lastBatch=0;error='';feedback=null;}
+  function clear(){for(const root of api.rosterRoots()){api.rosterPrioritizeFollowBack(api.rosterRows(root),false);root.querySelectorAll('.cm-roster-hidden').forEach(e=>e.classList.remove('cm-roster-hidden'));root.querySelectorAll('.cm-roster-action,.cm-roster-toolbar,.cm-roster-time,.cm-roster-interaction').forEach(e=>e.remove());}state=null;groupId='';mode='all';blueOnly=true;lastReferences='';lastBatch=0;error='';feedback=null;}
   async function queueControl(command){try{const result=await send('QUEUE_CONTROL',{accountId:state?.accountId,command});if(result?.state)adopt(result.state);if(!result?.ok)notify(result?.error||'队列操作失败',true);render();}catch(e){notify(e.message,true);}}
   async function enrich(retryFailed=false){
     if(enrichBusy||state?.groups?.find(g=>g.id===groupId)?.retryAt>Date.now())return;
@@ -75,6 +75,10 @@
       const lastFailure=state?.writeQueue?.jobs?.filter(j=>j.groupId===groupId&&j.error&&['failed','unconfirmed'].includes(j.status)).at(-1);
       if(lastFailure && Date.now()-lastFailure.updatedAt<10000)feedback={text:'@'+lastFailure.username+'：'+lastFailure.error.message,failed:true,until:lastFailure.updatedAt+10000};
       const users=api.rosterCachedUsers(state,group);let pending=0,unknown=0,remaining=0,failed=0,matched=0,unmatched=0,selfCount=0;
+      api.rosterPrioritizeFollowBack(rows,mode==='unfollowed',({row,username})=>{
+        const member=api.rosterMember(api.rosterCachedMember(users,state,username),row,username,state?.account);
+        return api.rosterRelation(member,state?.accountId)==='unfollowed'&&member?.followedBy===true;
+      });
       for(const {row,menu,username} of rows){const user=api.rosterMember(api.rosterCachedMember(users,state,username),row,username,{...state?.account,username:state?.account?.username||api.viewerUsername?.(),id:state?.accountId}),relation=api.rosterRelation(user,state?.accountId);if(relation==='self'){selfCount++;row.classList.add('cm-roster-hidden');row.querySelector('.cm-roster-action')?.remove();continue;}if(relation==='unfollowed')pending++;if(relation==='unknown'){unknown++;if(group?.failedReferences?.[username])failed++;else remaining++;}
         if(api.rosterMatches(user,state?.accountId,'unmatched'))unmatched++;
         // An unavailable result can arrive before the background checkpoint is
@@ -84,7 +88,7 @@
         const matches=api.rosterMatches(user,state?.accountId,mode,blueOnly,state?.memberInteractions?.members?.[user?.id])||(mode==='unavailable'&&unavailable);if(matches)matched++;
         row.classList.toggle('cm-roster-hidden',!matches||(unavailable&&mode!=='unavailable'));
         let button=row.querySelector('.cm-roster-action');if(!button){button=document.createElement('button');button.type='button';button.className='cm-roster-action';if(menu)menu.before(button);else row.append(button);}
-        button.dataset.relation=relation;button.textContent=unavailable?'账号不可用':({unfollowed:'关注',following:user?.followedBy===false?'未回关':user?.followedBy===true?'互关':'已关注',requested:'已请求',self:'自己',unknown:'待识别'})[relation];if(relation==='unknown'&&(!state||enrichBusy)&&!error)button.textContent='识别中…';if(user&&pendingFollows.has(username))button.textContent='提交中…';button.disabled=relation!=='unfollowed'||Boolean(user&&pendingFollows.has(username))||unavailable;
+        button.dataset.relation=relation;button.textContent=unavailable?'账号不可用':({unfollowed:api.rosterFollowLabel(user),following:user?.followedBy===false?'未回关':user?.followedBy===true?'互关':'已关注',requested:'已请求',self:'自己',unknown:'待识别'})[relation];if(relation==='unknown'&&(!state||enrichBusy)&&!error)button.textContent='识别中…';if(user&&pendingFollows.has(username))button.textContent='提交中…';button.disabled=relation!=='unfollowed'||Boolean(user&&pendingFollows.has(username))||unavailable;
         const showInteraction=mode==='all'||mode==='interacted';
         let interaction=row.querySelector('.cm-roster-interaction');if(showInteraction&&!interaction){interaction=document.createElement('span');interaction.className='cm-roster-interaction';interaction.style.cssText='font:11px system-ui;color:#63717c;margin-left:auto;margin-right:8px;white-space:nowrap';button.before(interaction);}
         const metrics=interactions?.members?.[user?.id];

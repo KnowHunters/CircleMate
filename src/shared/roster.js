@@ -42,6 +42,22 @@
   };
   api.rosterNeedsAction = (row,menu) => Boolean(menu && !row.querySelector('.cm-roster-action'));
   api.rosterListRows = root => {const scope=api.rosterListScope(root);return scope ? api.rosterRows(scope) : [];};
+  api.rosterFollowLabel = user => user?.followedBy===true ? '回关' : '关注';
+  const priorityStyles=new WeakMap();
+  // Keep native DOM nodes in place so X retains its member-row ownership.
+  api.rosterPrioritizeFollowBack = (rows,enabled,isFollowBack) => {
+    const parents=new Map();
+    for(const entry of rows){const parent=entry.row.parentElement;if(!parent)continue;if(!parents.has(parent))parents.set(parent,[]);parents.get(parent).push(entry);}
+    for(const [parent,entries] of parents){
+      let saved=priorityStyles.get(parent);
+      if(!enabled){if(saved){parent.style.display=saved.display;parent.style.flexDirection=saved.direction;for(const [row,order] of saved.orders)row.style.order=order;priorityStyles.delete(parent);}continue;}
+      const members=new Set(entries.map(e=>e.row));
+      if([...parent.children].some(child=>!members.has(child)))continue;
+      if(!saved){saved={display:parent.style.display,direction:parent.style.flexDirection,orders:new Map()};priorityStyles.set(parent,saved);}
+      parent.style.display='flex';parent.style.flexDirection='column';
+      for(const entry of entries){if(!saved.orders.has(entry.row))saved.orders.set(entry.row,entry.row.style.order);entry.row.style.order=isFollowBack(entry)?'0':'1';}
+    }
+  };
   // Native badges fill gaps left by relationship-only cache joins; gold/grey badges do not qualify.
   api.rosterBlueVerified = row => [...row.querySelectorAll('svg[aria-label],svg[data-testid="icon-verified"],svg[data-icon="icon-verified"]')].some(icon => {
     const label=icon.getAttribute('aria-label') || '';
