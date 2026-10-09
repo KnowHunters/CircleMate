@@ -1,0 +1,26 @@
+{
+  "source": "Native XChat Shared Worker request observed through authorized local Chrome debugging",
+  "account": "RssHunting",
+  "request": {
+    "origin": "https://api.x.com",
+    "method": "GET",
+    "path": "/graphql/7maV7hhqFCfZn-aHJ3Ln0w/GetGroupJoinRequestsQuery",
+    "variables": { "conversation_id": "g2107412709100933527", "cursor": {} },
+    "queryKeys": ["variables"]
+  },
+  "response": {
+    "status": 200,
+    "resultPath": "data.chat_by_conversation_id.conversation.get_group_join_requests",
+    "total_count": 1,
+    "user_ids_results_length": 1,
+    "cursor": { "list_exhausted": true }
+  },
+  "mainPageReplayWithDetailsClosed": {
+    "pathname": "/i/chat/g2107412709100933527",
+    "status": 200,
+    "totalCount": 1,
+    "users": 1,
+    "listExhausted": true
+  },
+  "redaction": "No request headers, cookies, tokens, applicant identity or message content retained"
+}
