@@ -85,11 +85,11 @@
         row.classList.toggle('cm-roster-hidden',!matches||(unavailable&&mode!=='unavailable'));
         let button=row.querySelector('.cm-roster-action');if(!button){button=document.createElement('button');button.type='button';button.className='cm-roster-action';if(menu)menu.before(button);else row.append(button);}
         button.dataset.relation=relation;button.textContent=unavailable?'账号不可用':({unfollowed:'关注',following:user?.followedBy===false?'未回关':user?.followedBy===true?'互关':'已关注',requested:'已请求',self:'自己',unknown:'待识别'})[relation];if(relation==='unknown'&&(!state||enrichBusy)&&!error)button.textContent='识别中…';if(user&&pendingFollows.has(username))button.textContent='提交中…';button.disabled=relation!=='unfollowed'||Boolean(user&&pendingFollows.has(username))||unavailable;
-        let interaction=row.querySelector('.cm-roster-interaction');if(!interaction){interaction=document.createElement('span');interaction.className='cm-roster-interaction';interaction.style.cssText='font:11px system-ui;color:#63717c;margin-left:auto;margin-right:8px;white-space:nowrap';button.before(interaction);}
+        const showInteraction=mode==='all'||mode==='interacted';
+        let interaction=row.querySelector('.cm-roster-interaction');if(showInteraction&&!interaction){interaction=document.createElement('span');interaction.className='cm-roster-interaction';interaction.style.cssText='font:11px system-ui;color:#63717c;margin-left:auto;margin-right:8px;white-space:nowrap';button.before(interaction);}
         const metrics=interactions?.members?.[user?.id];
-        interaction.textContent=metrics?[metrics.likes?`点赞 ${metrics.likes}`:'',metrics.replies?`评论 ${metrics.replies}`:''].filter(Boolean).join(' · '):'暂无记录';
-        interaction.title='对方与你的已采集互动；未匹配到记录不等于没有互动。';
-        button.style.marginLeft='0';
+        if(interaction){interaction.hidden=!showInteraction;interaction.textContent=metrics?[metrics.likes?`点赞 ${metrics.likes}`:'',metrics.replies?`评论 ${metrics.replies}`:''].filter(Boolean).join(' · '):'暂无记录';interaction.title='对方与你的已采集互动；未匹配到记录不等于没有互动。';}
+        button.style.marginLeft=showInteraction?'0':'auto';
         if(button.getAttribute('aria-label')!==button.textContent+' @'+username)button.setAttribute('aria-label',button.textContent+' @'+username);
         const queuedFollow=api.rosterQueuedFollow(followOrder,username,state?.accountId,followRetryAt,Date.now(),followPaused&&activeFollow?.username!==username);
         if(queuedFollow){button.textContent=queuedFollow.label;if(activeFollow?.username===username)button.textContent=activeFollow.action==='UNFOLLOW'?'取关中…':'关注中…';else if(!followPaused&&followRetryAt<=Date.now())button.textContent='排队中…';button.disabled=true;button.dataset.relation='queued';button.title='操作队列第 '+queuedFollow.position+' 位';button.setAttribute('aria-label',button.textContent+' @'+username);}
@@ -105,6 +105,7 @@
         if(relation==='following'){
           if(!time){time=document.createElement('span');time.className='cm-roster-time';time.style.cssText='font:11px system-ui;color:#63717c;margin-right:8px;white-space:nowrap';button.before(time);}
           const timing=api.rosterFollowTime(user);time.textContent=timing.label;time.title=timing.title;
+          time.style.marginLeft=showInteraction?'0':'auto';
           button.style.marginLeft='0';
           if(mode==='all'){
             if(!queuedFollow){button.textContent='已关注';button.title='已关注';button.disabled=true;button.setAttribute('aria-label','已关注 @'+username);}
