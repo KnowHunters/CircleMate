@@ -18,7 +18,7 @@
   async function pageRequest(message) {
     if (!['https://x.com','https://twitter.com'].includes(location.origin)) return { handled: false };
     const allowed = message.method === 'POST' ? /^\/i\/api\/1\.1\/friendships\/(create|destroy)\.json$/.test(message.path) && /^\d{1,30}$/.test(String(message.params?.user_id || '')) :
-      message.method === 'GET' && (/^\/i\/api\/graphql\/[\w-]+\/(UserByScreenName|UserByRestId|Following|Followers|BlueVerifiedFollowers|VerifiedFollowers|UserOriginalsTimeline|UserRepliesTimeline|UserRepostsTimeline|UserTweets|UserTweetsAndReplies|accountOverviewDailyQuery)$/.test(message.path) || /^\/i\/api\/1\.1\/(friends|followers)\/list\.json$/.test(message.path));
+      message.method === 'GET' && (/^\/i\/api\/graphql\/[\w-]+\/(NotificationsTimeline|UserByScreenName|UserByRestId|Following|Followers|BlueVerifiedFollowers|VerifiedFollowers|UserOriginalsTimeline|UserRepliesTimeline|UserRepostsTimeline|UserTweets|UserTweetsAndReplies|accountOverviewDailyQuery)$/.test(message.path) || /^\/i\/api\/1\.1\/(friends|followers)\/list\.json$/.test(message.path));
     if (!allowed) return { handled: true, error: '不支持的页面请求', code: 'REQUEST_REJECTED' };
     const csrf = cookie('ct0'), id = cookie('twid').replace(/^u=/,'').replace(/"/g,'');
     if (id && id !== message.accountId) return { handled: true, error: '登录会话已切换，请刷新后重试', code: 'ACCOUNT_MISMATCH' };

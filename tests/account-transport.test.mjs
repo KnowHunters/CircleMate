@@ -105,6 +105,8 @@ test('content transport restricts sender, endpoint and account, then posts only 
   assert.equal(requests.length, 1); assert.equal(requests[0].options.credentials, 'include');
   assert.equal(requests[0].options.headers['x-csrf-token'], 'csrf');
   assert.equal(requests[0].options.body.toString(), 'user_id=2');
+  assert.equal((await call({ ...message, method: 'GET', path: '/i/api/graphql/4TuDRWeusve2-BH2IqldBg/NotificationsTimeline', params: { variables: '{}' } })).status, 200);
+  assert.equal(requests.length, 2);
 });
 
 test('profile supports mixed core and legacy fields while retaining username checks',async()=>{

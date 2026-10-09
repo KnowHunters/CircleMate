@@ -1,5 +1,15 @@
 import test from 'node:test';import assert from 'node:assert/strict';import vm from 'node:vm';import {readFile} from 'node:fs/promises';
 const source=await readFile(new URL('../src/shared/roster.js',import.meta.url),'utf8');
+test('interaction filter honors known events, blue filter and excludes self or unavailable members',()=>{
+ const context={document:{querySelectorAll:()=>[]}};vm.runInNewContext(source,context);
+ const match=context.CircleMate.rosterMatches,user={id:'2',following:true,blueVerified:true};
+ assert.equal(match(user,'1','interacted',true,{likes:1,replies:0}),true);
+ assert.equal(match(user,'1','interacted',true,{likes:0,replies:1}),true);
+ assert.equal(match(user,'1','interacted',true,null),false);
+ assert.equal(match({...user,blueVerified:false},'1','interacted',true,{likes:1}),false);
+ assert.equal(match({...user,availability:'unavailable'},'1','interacted',false,{likes:1}),false);
+ assert.equal(match(user,'2','interacted',false,{likes:1}),false);
+});
 
 test('native chat shadow attached after initial discovery is found without a full rescan',()=>{
  let scans=0;const host={nodeType:1,shadowRoot:null,querySelectorAll:()=>[]};

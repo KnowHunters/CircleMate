@@ -50,7 +50,7 @@
       if(!rows.length)continue;
       if(!root.querySelector('[data-cm-roster-style]')){const sheet=document.createElement('style');sheet.dataset.cmRosterStyle='1';sheet.textContent=style;(root===document?document.head:root).append(sheet);}
       let bar=root.querySelector('.cm-roster-toolbar');if(!bar){bar=document.createElement('div');bar.className='cm-roster-toolbar';bar.setAttribute('aria-label','CircleMate 成员筛选');
-        for(const [value,label] of [['all','全部'],['unfollowed','未关注'],['unmatched','未回关'],['unavailable','异常']]){const b=document.createElement('button');b.type='button';b.textContent=label;b.dataset.mode=value;b.onclick=()=>{mode=value;render();};bar.append(b);}
+        for(const [value,label] of [['all','全部'],['unfollowed','未关注'],['unmatched','未回关'],['interacted','互动'],['unavailable','异常']]){const b=document.createElement('button');b.type='button';b.textContent=label;b.dataset.mode=value;b.onclick=()=>{mode=value;render();};bar.append(b);}
         const blueLabel=document.createElement('label');blueLabel.className='cm-roster-blue';const blueCheck=document.createElement('input');blueCheck.type='checkbox';blueCheck.setAttribute('aria-label','蓝V');blueCheck.dataset.blue='1';blueCheck.onchange=()=>{blueOnly=blueCheck.checked;render();};blueLabel.append(blueCheck,document.createTextNode('蓝V'));bar.append(blueLabel);
         const next=document.createElement('button');next.type='button';next.textContent='识别下一批';next.dataset.enrich='1';next.onclick=()=>void enrich(true);bar.append(next);
         const sync=document.createElement('button');sync.type='button';sync.textContent='同步互动';sync.dataset.interactions='1';sync.onclick=async()=>{const accountId=state?.accountId,originGroup=groupId;sync.disabled=true;try{const result=await send('ROSTER_INTERACTIONS',{accountId});if(state?.accountId===accountId&&groupId===originGroup){if(result?.state)adopt(result.state);if(!result?.ok)notify(result?.error||'互动同步失败',true);render();}}catch(e){notify(e.message,true);}finally{sync.disabled=false;}};bar.append(sync);
@@ -70,6 +70,7 @@
       let interactionNote=bar.querySelector('.cm-roster-interaction-note');if(!interactionNote){interactionNote=document.createElement('span');interactionNote.className='cm-roster-note cm-roster-interaction-note';bar.append(interactionNote);}
       const interactionStatus=interactions?.retryAt>Date.now()?`冷却 ${Math.ceil((interactions.retryAt-Date.now())/1000)} 秒`:interactions?.status==='syncing'?'同步中':interactions?.status==='pending'?'等待续传':interactions?.error?'同步失败':'已缓存';
       interactionNote.textContent=interactions?.updatedAt?`互动${interactionStatus} · 部分通知记录 · 更新于 ${new Date(interactions.updatedAt).toLocaleString('zh-CN',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'})}`:`互动${interactionStatus} · 尚未采集记录`;
+      if(interactions?.error)interactionNote.textContent+=' · '+interactions.error;
       interactionNote.title=interactions?.error||'显示对方点赞或评论你的已采集记录，不代表完整历史；点赞时间为通知时间。';
       const lastFailure=state?.writeQueue?.jobs?.filter(j=>j.groupId===groupId&&j.error&&['failed','unconfirmed'].includes(j.status)).at(-1);
       if(lastFailure && Date.now()-lastFailure.updatedAt<10000)feedback={text:'@'+lastFailure.username+'：'+lastFailure.error.message,failed:true,until:lastFailure.updatedAt+10000};
@@ -80,7 +81,7 @@
         // reflected in the roster projection. Keep the local terminal state
         // authoritative for this render, and show it only in the 异常 filter.
         const unavailable=user?.availability==='unavailable';
-        const matches=api.rosterMatches(user,state?.accountId,mode,blueOnly)||(mode==='unavailable'&&unavailable);if(matches)matched++;
+        const matches=api.rosterMatches(user,state?.accountId,mode,blueOnly,state?.memberInteractions?.members?.[user?.id])||(mode==='unavailable'&&unavailable);if(matches)matched++;
         row.classList.toggle('cm-roster-hidden',!matches||(unavailable&&mode!=='unavailable'));
         let button=row.querySelector('.cm-roster-action');if(!button){button=document.createElement('button');button.type='button';button.className='cm-roster-action';if(menu)menu.before(button);else row.append(button);}
         button.dataset.relation=relation;button.textContent=unavailable?'账号不可用':({unfollowed:'关注',following:user?.followedBy===false?'未回关':user?.followedBy===true?'互关':'已关注',requested:'已请求',self:'自己',unknown:'待识别'})[relation];if(relation==='unknown'&&(!state||enrichBusy)&&!error)button.textContent='识别中…';if(user&&pendingFollows.has(username))button.textContent='提交中…';button.disabled=relation!=='unfollowed'||Boolean(user&&pendingFollows.has(username))||unavailable;
@@ -137,7 +138,7 @@
       const feedbackNode=bar.querySelector('.cm-roster-feedback');feedbackNode.hidden=!feedback||feedback.until<=Date.now();if(!feedbackNode.hidden){feedbackNode.textContent=feedback.text;feedbackNode.dataset.failed=String(feedback.failed);feedbackNode.setAttribute('role',feedback.failed?'alert':'status');}
       const waitingForCache=Boolean(state)&&!(state.relationships?.following?.cachedComplete||state.relationships?.following?.complete);
       const next=bar.querySelector('[data-enrich]');const automatic=!error&&(!state||enrichBusy||remaining>0);next.hidden=automatic||failed===0;next.disabled=enrichBusy||!groupId||group?.retryAt>Date.now();next.textContent='重试失败成员';
-      const note=bar.querySelector('.cm-roster-note'),text=error||(!state ? `正在读取缓存 · 已加载 ${rows.length} 人` : `已加载 ${rows.length-selfCount} 人 · ${blueOnly?'蓝V · ':''}${({all:'全部',unfollowed:'未关注',unmatched:'未回关',mutual:'互关',unavailable:'异常'})[mode]} ${matched} 人${unknown?(waitingForCache?' · 关注名单尚未完整（已缓存 '+(state.relationships?.following?.users?.length||0)+' 人）':' · '+unknown+' 人关系待确认'):''}${enrichBusy?' · 识别中':''}`);
+      const note=bar.querySelector('.cm-roster-note'),text=error||(!state ? `正在读取缓存 · 已加载 ${rows.length} 人` : `已加载 ${rows.length-selfCount} 人 · ${blueOnly?'蓝V · ':''}${({all:'全部',unfollowed:'未关注',unmatched:'未回关',interacted:'互动',mutual:'互关',unavailable:'异常'})[mode]} ${matched} 人${unknown?(waitingForCache?' · 关注名单尚未完整（已缓存 '+(state.relationships?.following?.users?.length||0)+' 人）':' · '+unknown+' 人关系待确认'):''}${enrichBusy?' · 识别中':''}`);
       note.dataset.loading=String(!(group?.retryAt>Date.now())&&!error&&(!state||enrichBusy||remaining>0));
       if(mode==='unavailable')bar.querySelector('.cm-roster-note').dataset.loading='false';
       const queued=followOrder.length;

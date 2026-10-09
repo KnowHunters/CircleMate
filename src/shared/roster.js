@@ -91,9 +91,10 @@
     return {label:days===0?'今天关注':days===1?'昨天关注':days+'天前关注',title:'本地确认时间（北京时间）：'+date.toLocaleString('zh-CN',{timeZone:'Asia/Shanghai',hour12:false})};
   };
   api.rosterRelation = (user,accountId) => !user ? 'unknown' : accountId != null && user.id != null && String(user.id)===String(accountId) ? 'self' : user.availability==='unavailable' ? 'unavailable' : user.followRequested ? 'requested' : user.following===true ? 'following' : user.following===false ? 'unfollowed' : 'unknown';
-  api.rosterMatches = (user,accountId,mode,blueOnly=false) => {
+  api.rosterMatches = (user,accountId,mode,blueOnly=false,interaction=null) => {
     const relation=api.rosterRelation(user,accountId);
     if(mode==='unavailable')return relation==='unavailable';
+    if(mode==='interacted')return relation!=='self' && relation!=='unavailable' && (!blueOnly||user?.blueVerified===true) && Boolean(interaction&&(interaction.likes>0||interaction.replies>0));
     return relation!=='self' && (!blueOnly || user?.blueVerified===true) && (mode==='all' || mode==='unfollowed' && relation==='unfollowed' && user?.availability!=='unavailable' || mode==='unavailable' && user?.availability==='unavailable' || mode==='unmatched' && relation==='following' && user.followedBy===false || mode==='mutual' && relation==='following' && user.followedBy===true);
   };
 })();

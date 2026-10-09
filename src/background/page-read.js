@@ -2,7 +2,7 @@
 // Read-only, fixed-origin requests; no page navigation, listeners or DOM writes.
 export async function readInPage(input) {
   if (location.origin !== input.origin || !['https://x.com','https://twitter.com'].includes(location.origin) ||
-      !/^\/i\/api\/graphql\/[\w-]+\/(UserByScreenName|UserByRestId|Following|Followers|BlueVerifiedFollowers|VerifiedFollowers|UserOriginalsTimeline|UserRepliesTimeline|UserRepostsTimeline|UserTweets|UserTweetsAndReplies|accountOverviewDailyQuery)$/.test(input.path)) return { handled: false };
+      !/^\/i\/api\/graphql\/[\w-]+\/(NotificationsTimeline|UserByScreenName|UserByRestId|Following|Followers|BlueVerifiedFollowers|VerifiedFollowers|UserOriginalsTimeline|UserRepliesTimeline|UserRepostsTimeline|UserTweets|UserTweetsAndReplies|accountOverviewDailyQuery)$/.test(input.path)) return { handled: false };
   const cookie = name => {
     try { return decodeURIComponent(document.cookie.split(';').map(v=>v.trim()).find(v=>v.startsWith(name+'='))?.slice(name.length+1) || ''); } catch { return ''; }
   };
