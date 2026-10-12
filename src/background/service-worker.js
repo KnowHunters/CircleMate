@@ -1,6 +1,7 @@
 import {PostInteractions} from './post-interactions.js';
 import {syncNotifications} from './member-interactions.js';
 import {syncGroupReviews,reviewProjection} from './group-reviews.js';
+import {replyActivity} from './reply-activity.js';
 import '../shared/timeline-context.js';
 import { AccountRepository } from "./repository.js";
 import { SessionProvider } from "./session.js";
@@ -118,6 +119,9 @@ chrome.webRequest.onCompleted.addListener(details => {
   void ready.then(async () => { if (registry.completed(details)) await registry.save(); }).catch(() => {});
 }, { urls: ["https://x.com/i/api/graphql/*", "https://twitter.com/i/api/graphql/*",'https://x.com/i/api/1.1/friendships/*.json','https://twitter.com/i/api/1.1/friendships/*.json'] });
 chrome.runtime.onMessage.addListener((message, sender, respond) => {
+  if(sender.id===chrome.runtime.id&&sender.tab&&sender.frameId===0&&message?.action==='REPLY_ACTIVITY'){
+    void(async()=>{try{const s=await sessions.get(sender.tab.id,false),state=await repository.load(s.accountId);respond({ok:true,accountId:s.accountId,activity:replyActivity(state)});}catch{respond({ok:false});}})();return true;
+  }
   if(sender.id===chrome.runtime.id&&sender.tab&&sender.frameId===0&&message?.action==='GROUP_REVIEWS'){
     void(async()=>{try{
       const tab=await chrome.tabs.get(sender.tab.id);if(!/^https:\/\/x\.com\/i\/chat(?:\/|$)/.test(tab.url))throw Error('聊天列表已关闭');
@@ -171,7 +175,7 @@ chrome.runtime.onMessage.addListener((message, sender, respond) => {
         const s=await sessions.get(sender.tab.id,false);
         if(message.accountId!==s.accountId)throw new Error('登录账号已切换');
         const state=await repository.load(s.accountId);
-        if(message.action==='POSTS_REPLY'||timeline){const result=await postInteractions.reply(s,{...message,timeline},state,checkpoint);respond({ok:true,...result});return;}
+        if(message.action==='POSTS_REPLY'||timeline){const result=await postInteractions.reply(s,{...message,timeline},state,checkpoint);respond({ok:true,...result,activity:replyActivity(state)});scheduleSync(s.tabId);return;}
         const data=message.action==='POSTS_LIKE'?await postInteractions.like(s,message,state,checkpoint):await postInteractions.read(s,message.username,Boolean(message.refresh));
         let changed=false;
         for(const post of data.posts){const intent=state.postLikeIntents?.[post.id];if(intent&&intent.liked===post.liked){delete state.postLikeIntents[post.id];changed=true;}else if(intent)post.unconfirmed=true;}

@@ -61,6 +61,7 @@
           input.value = '';
           status.textContent = '回复已发送';
           token = crypto.randomUUID();
+          onClose();
         }
       } catch (error) {
         locked = error?.code !== 'WRITE_NOT_SENT';

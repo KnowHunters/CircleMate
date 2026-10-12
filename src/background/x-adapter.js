@@ -77,7 +77,7 @@ export class XWebAdapter {
     if(result?.data?.errors?.length)throw new ApiError('X 返回回复错误，请先到原帖核验结果','WRITE_UNCONFIRMED');
     const tweet=result?.data?.data?.create_tweet?.tweet_results?.result,legacy=tweet?.legacy;
     if(result?.status!==200||!/^\d{1,30}$/.test(tweet?.rest_id||'')||legacy?.user_id_str!==s.accountId||legacy?.in_reply_to_status_id_str!==tweetId||!legacy.full_text?.endsWith(text))throw new ApiError('回复结果未确认，请到原帖核验','WRITE_UNCONFIRMED');
-    await this.sessions.assertCurrent(s);return {confirmed:true,replyId:tweet.rest_id};
+    await this.sessions.assertCurrent(s);return {confirmed:true,replyId:tweet.rest_id,replyAt:Number.isFinite(Date.parse(legacy.created_at))?Date.parse(legacy.created_at):null};
   }
   async nativeSnapshot(s) {
     if (!this.chrome?.tabs.sendMessage) return null;

@@ -1,4 +1,5 @@
 import {normalizeUser} from './domain.js';
+import {recordConfirmedReply} from './reply-activity.js';
 export class PostInteractions {
   constructor(adapter,{now=Date.now}={}){this.adapter=adapter;this.now=now;this.cache=new Map();this.cooldowns=new Map();}
   async read(s,username,refresh=false){
@@ -30,7 +31,7 @@ export class PostInteractions {
     }
     if(Object.keys(state.replyIntents).length>=100&&!existing){const oldest=Object.keys(state.replyIntents).find(id=>state.replyIntents[id].status==='complete');if(oldest)delete state.replyIntents[oldest];else throw Object.assign(new Error('待核验回复过多'),{code:'WRITE_NOT_SENT'});}
     state.replyIntents[message.tweetId]={token:message.token,status:'running',at:this.now()};await checkpoint(s,state);
-    try{const result=await this.adapter.reply(s,message.tweetId,message.text);state.replyIntents[message.tweetId]={token:message.token,status:'complete',replyId:result.replyId,at:this.now()};await checkpoint(s,state);this.cache.delete(s.accountId+':'+message.username.toLowerCase());return result;}catch(error){if(error.code==='WRITE_NOT_SENT'){delete state.replyIntents[message.tweetId];await checkpoint(s,state);}throw error;}
+    try{const result=await this.adapter.reply(s,message.tweetId,message.text);if(!result?.confirmed||!/^\d{1,30}$/.test(result.replyId||''))throw Object.assign(new Error('回复结果未确认'),{code:'WRITE_UNCONFIRMED'});const at=Number.isFinite(result.replyAt)?result.replyAt:this.now();state.replyIntents[message.tweetId]={token:message.token,status:'complete',replyId:result.replyId,at};recordConfirmedReply(state,result.replyId,message.tweetId,at,this.now());await checkpoint(s,state);this.cache.delete(s.accountId+':'+message.username.toLowerCase());return result;}catch(error){if(error.code==='WRITE_NOT_SENT'){delete state.replyIntents[message.tweetId];await checkpoint(s,state);}throw error;}
   }
   async like(s,message,state,checkpoint){
     if(message.accountId!==s.accountId||typeof message.liked!=='boolean'||!/^\d{1,30}$/.test(message.tweetId||''))throw new Error('操作参数或登录账号不匹配');

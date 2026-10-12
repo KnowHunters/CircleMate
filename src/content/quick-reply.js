@@ -3,6 +3,10 @@
   if (window !== window.top) return;
   const api=globalThis.CircleMate ||= {},articles = new Set(), pending = new Set();
   let path = '', timer, active=null;
+  let activityAccount='',activityDay='',replied=new Set(),loadingActivity=false;
+  const today=()=>new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Shanghai'}).format(new Date());
+  function adoptActivity(owner,activity){if(owner!==account())return;activityAccount=owner;activityDay=activity?.today||'';replied=new Set(activityDay===today()?activity?.postIds||[]:[]);for(const article of articles)pending.add(article);schedule();}
+  async function loadActivity(){if(loadingActivity||!isProfile())return;loadingActivity=true;try{const result=await chrome.runtime.sendMessage({action:'REPLY_ACTIVITY'});if(result?.ok)adoptActivity(result.accountId,result.activity);}catch{}finally{loadingActivity=false;}}
   const isProfile = () => api.isTimelinePath?.(location.pathname) === true;
   function account(){try{return decodeURIComponent(document.cookie.split(';').map(x=>x.trim()).find(x=>x.startsWith('twid='))?.slice(5)||'').replace(/^u=/,'').replace(/"/g,'');}catch{return '';}}
   function target(article){const anchor=article.querySelector('a[href] time')?.closest('a');if(!anchor||anchor.closest('article')!==article)return null;const url=new URL(anchor.href,location.origin),match=url.pathname.match(/^\/([a-z0-9_]{1,15})\/status\/(\d{1,30})\/?$/i);return url.origin===location.origin&&match?{username:match[1].toLowerCase(),tweetId:match[2]}:null;}
@@ -15,7 +19,7 @@
     const valid=()=>article.isConnected&&isProfile()&&location.pathname===route&&account()===accountId&&target(article)?.tweetId===post.tweetId;
     const view=api.createInlineReply({accountId,...post,onClose:()=>{hide();button.focus({preventScroll:true});},onSend:async(text,token)=>{
       if(!valid())throw Object.assign(new Error('帖子或账号已切换，请重新展开回复框'),{code:'WRITE_NOT_SENT'});
-      const result=await chrome.runtime.sendMessage({action:'TIMELINE_REPLY',accountId,...post,text,token});if(!result?.ok)throw Object.assign(new Error(result?.error||'回复结果未确认'),{code:result?.code});return result;
+      const result=await chrome.runtime.sendMessage({action:'TIMELINE_REPLY',accountId,...post,text,token});if(!result?.ok)throw Object.assign(new Error(result?.error||'回复结果未确认'),{code:result?.code});if(result.confirmed)adoptActivity(accountId,result.activity);return result;
     }});
     view.element.classList.add('cm-timeline-reply');const color=getComputedStyle(article).color.match(/\d+/g);view.element.dataset.dark=String(color&&Number(color[0])>160);
     for(const type of ['click','keydown','pointerdown'])view.element.addEventListener(type,event=>event.stopPropagation());
@@ -24,6 +28,7 @@
   const style = document.createElement('style');
   style.textContent = '.cm-quick-reply{flex:0 0 auto;margin:0 0 0 12px;padding:0;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--cm-icon-color)!important}.cm-quick-reply:hover,.cm-quick-reply[aria-expanded=true]{color:rgb(29,155,240)!important}.cm-quick-reply:hover{background:rgba(29,155,240,.1);border-radius:50%}.cm-quick-reply:focus-visible{outline:2px solid rgb(29,155,240);outline-offset:2px}.cm-quick-reply:disabled{opacity:.4;cursor:default}.cm-quick-reply svg{fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;color:inherit}';
   document.head.append(style);
+  style.textContent+='.cm-quick-reply{position:relative}.cm-quick-reply[data-replied-today=true]{color:#16834b!important}.cm-reply-done{position:absolute;right:-1px;top:-2px;display:flex;align-items:center;justify-content:center;width:13px;height:13px;border-radius:50%;background:#16834b;color:#fff;font:700 10px system-ui;pointer-events:none}';
   style.textContent+=api.inlineReplyCss+'.cm-quick-reply[aria-expanded=true]{color:rgb(29,155,240)!important}.cm-timeline-reply{margin:12px 0 8px;--cm-muted:#536471;--cm-line:#cfd9de88}.cm-timeline-reply[data-dark=true]{--cm-muted:#a0adb8;--cm-line:#53647188}';
   function update(article) {
     const existing = article.querySelector('.cm-quick-reply');
@@ -44,6 +49,12 @@
       const icon=button.querySelector('svg');
       if(icon){icon.style.width=(size.width||18)+'px';icon.style.height=(size.height||18)+'px';}
       button.disabled=reply.disabled||reply.getAttribute('aria-disabled')==='true';
+      const done=activityAccount===account()&&activityDay===today()&&replied.has(post.tweetId);
+      button.dataset.repliedToday=String(done);
+      const label=document.documentElement.lang.startsWith('zh')?(done?'快速回复（今日已回复）':'快速回复'):(done?'Quick reply (replied today)':'Quick reply');
+      button.title=label;button.setAttribute('aria-label',label);
+      let mark=button.querySelector('.cm-reply-done');
+      if(done&&!mark){mark=document.createElement('span');mark.className='cm-reply-done';mark.textContent='✓';mark.setAttribute('aria-hidden','true');button.append(mark);}else if(!done)mark?.remove();
     }
     if (existing) {syncAppearance(existing);return;}
     const button = reply.cloneNode(false);
@@ -67,6 +78,7 @@
     group.append(button);
   }
   function flush() {
+    if(activityAccount!==account()||activityDay!==today()){activityAccount=account();activityDay=today();replied.clear();for(const article of articles)pending.add(article);void loadActivity();}
     if(active&&(!active.article.isConnected||!isProfile()||active.route!==location.pathname||active.accountId!==account()||target(active.article)?.tweetId!==active.tweetId))hide();
     if (path !== location.pathname) {
       path = location.pathname;
@@ -96,5 +108,8 @@
   }).observe(document.documentElement, {childList:true,subtree:true,attributes:true,attributeFilter:['disabled','aria-disabled','href']});
   addEventListener('popstate', schedule);
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)schedule();});setInterval(()=>{if(active)schedule();},1000);
+  chrome.storage?.onChanged?.addListener((changes,area)=>{if(area!=='local')return;const next=changes['circlemate_view_'+account()]?.newValue;if(next?.accountId===account())adoptActivity(next.accountId,next.replyActivity);});
+  setInterval(()=>{for(const article of articles)pending.add(article);schedule();},60000);
+  void loadActivity();
   schedule();
 })();

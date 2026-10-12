@@ -1,4 +1,5 @@
 import { LIST_KINDS, validId, normalizeUser, upsertUser, completeSnapshot, groupUsers, followBackUsers,recordRelationshipEvent } from "./domain.js";
+import {rememberReply,replyRecords,pruneReplies} from './reply-activity.js';
 export function createServices({ adapter, checkpoint }) {
   async function syncList(s, state, kind, restart = false) {
     if (!LIST_KINDS.includes(kind)) throw new Error("不支持的名单类型");
@@ -157,6 +158,9 @@ export function createServices({ adapter, checkpoint }) {
         task.status = "error"; task.error = { code: error.code || "CREATOR_FAILED", message: error.message }; task.retryAt = error.retryAt || null;
         throw error;
       } finally {
+      for(const t of Object.values(task.records))if(!t.retweeted_status&&t.in_reply_to_status_id_str)rememberReply(state,t.id_str,t.in_reply_to_status_id_str,Date.parse(t.created_at),false);
+      pruneReplies(state);
+      task.records={...task.records,...replyRecords(state,task.today)};
       const tweets = Object.values(task.records);
       const today = task.today; const dated = tweets.filter(t => Number.isFinite(Date.parse(t.created_at)));
       const daily = dated.filter(t => format.format(new Date(t.created_at)) === today);

@@ -5,6 +5,9 @@ export function migrateAccount(input, accountId) {
   if(![3,4].includes(input.schemaVersion))throw new Error('不支持此缓存版本，原数据已保留');
   const state=structuredClone(input);
   state.users ||= {};state.groups ||= {};state.lists ||= {};state.tasks ||= {};
+  if(!state.confirmedReplies){
+    state.confirmedReplies=Object.fromEntries(Object.entries(state.replyIntents||{}).filter(([postId,r])=>/^\d{1,30}$/.test(postId)&&r?.status==='complete'&&/^\d{1,30}$/.test(r.replyId||'')&&Number.isFinite(r.at)&&r.at>=Date.now()-7*86400000).map(([postId,r])=>[r.replyId,{postId,at:r.at}]));
+  }
   if(state.schemaVersion===3){
     delete state.dailyPlan;
     state.writeQueue={jobs:[],paused:false,nextAt:0};
@@ -17,6 +20,10 @@ export function validateBackup(input, accountId) {
   if(!input||JSON.stringify(input).length>8*1024*1024)throw new Error('备份文件无效或超过 8 MB');
   const state=migrateAccount(input,accountId);
   validateCreatorLibrary(state.creatorLibrary);
+  if(state.confirmedReplies){
+    if(typeof state.confirmedReplies!=='object'||Array.isArray(state.confirmedReplies)||Object.keys(state.confirmedReplies).length>5000)throw new Error('备份回复记录无效');
+    for(const [id,record]of Object.entries(state.confirmedReplies))if(!/^\d{1,30}$/.test(id)||!/^\d{1,30}$/.test(record?.postId||'')||!Number.isFinite(record?.at)||!Number.isFinite(new Date(record.at).getTime()))throw new Error('备份回复记录无效');
+  }
   if(state.groupReviews){
     if(typeof state.groupReviews!=='object'||Array.isArray(state.groupReviews)||Object.keys(state.groupReviews).length>200)throw new Error('备份群审核缓存无效');
     for(const [id,record]of Object.entries(state.groupReviews)){
