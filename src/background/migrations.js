@@ -29,6 +29,7 @@ export function validateBackup(input, accountId) {
     for(const [id,record]of Object.entries(state.groupReviews)){
       if(!/^g\d{1,30}$/.test(id)||!record||record.count!=null&&(!Number.isSafeInteger(record.count)||record.count<0)||record.updatedAt!=null&&!Number.isFinite(record.updatedAt))throw new Error('备份群审核数量无效');
       record.nextAt=0;record.status='error';record.error='恢复的缓存，等待重新同步';
+      record.canReview=false;record.permissionCheckedAt=null;
     }
     state.groupReviewRetryAt=0;
   }

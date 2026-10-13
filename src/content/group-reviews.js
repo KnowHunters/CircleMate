@@ -11,7 +11,7 @@
   if(viewerId()!==accountId){clear();return;}
   for(const {row,root,id} of rows()){
    const record=reviews[id];let badge=row.querySelector('.cm-group-review');
-   if(!Number.isSafeInteger(record?.count)||record.count<=0){removeBadge(row);continue;}
+   if(record?.canReview!==true||!Number.isFinite(record.permissionCheckedAt)||Date.now()-record.permissionCheckedAt>=3600000||!Number.isSafeInteger(record?.count)||record.count<=0){removeBadge(row);continue;}
    if(!root.querySelector('[data-cm-group-review-style]')){const sheet=document.createElement('style');sheet.dataset.cmGroupReviewStyle='1';sheet.textContent=css;(root===document?document.head:root).append(sheet);}
    if(!badge){badge=document.createElement('span');badge.className='cm-group-review';badge.setAttribute('role','button');badge.tabIndex=0;
     const open=event=>{event.preventDefault();event.stopPropagation();if(!event.isTrusted||viewerId()!==accountId)return;location.assign('/i/chat/'+id+'/info');};
@@ -31,7 +31,8 @@
   if(!/^\/i\/chat(?:\/|$)/.test(location.pathname)){clear();return;}
   const current=viewerId();if(!/^\d{1,30}$/.test(current)){clear();return;}
   if(current!==accountId){clear();accountId=current;}
-  const ids=[...new Set(rows().filter(({row})=>{const rect=row.getBoundingClientRect();return rect.bottom>0&&rect.top<innerHeight;}).map(e=>e.id))].slice(0,20);
+  const currentGroup=location.pathname.match(/^\/i\/chat\/(g\d{1,30})\/info\/?$/)?.[1];
+  const ids=[...new Set([...(currentGroup?[currentGroup]:[]),...rows().filter(({row})=>{const rect=row.getBoundingClientRect();return rect.bottom>0&&rect.top<innerHeight;}).map(e=>e.id)])].slice(0,20);
   if(!ids.length)return;busy=true;
   try{const result=await chrome.runtime.sendMessage({action:'GROUP_REVIEWS',groupIds:ids});if(viewerId()===current&&result?.ok&&result.accountId===current){accountId=current;reviews={...reviews,...result.reviews};render();}}
   catch{}finally{busy=false;}

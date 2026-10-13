@@ -29,9 +29,9 @@ export function parseUserPage(payload) {
   return { users, cursor: terminated ? null : bottom, complete: terminated, source: "graphql" };
 }
 export class XWebAdapter {
-  async groupReview(s,groupId){
+  async groupReview(s,groupId,permission){
     await this.sessions.assertCurrent(s);
-    const frames=await this.chrome.scripting.executeScript({target:{tabId:s.tabId,frameIds:[0]},world:'MAIN',func:readGroupReviewInPage,args:[{origin:s.origin,accountId:s.accountId,authorization:s.authorization,groupId}]});
+    const frames=await this.chrome.scripting.executeScript({target:{tabId:s.tabId,frameIds:[0]},world:'MAIN',func:readGroupReviewInPage,args:[{origin:s.origin,accountId:s.accountId,authorization:s.authorization,groupId,canReview:permission?.canReview===true,permissionCheckedAt:permission?.permissionCheckedAt}]});
     const result=frames[0]?.result;
     if(!result||result.error)throw new ApiError(result?.error||'审核同步失败',result?.code||'PAGE_REQUEST_FAILED',result?.retryAt);
     await this.sessions.assertCurrent(s);return result;

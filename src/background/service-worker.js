@@ -30,7 +30,7 @@ function scheduleReviews(tabId,ids){
   void scheduler.add(async()=>{
     try{const tab=await chrome.tabs.get(tabId);if(!/^https:\/\/x\.com\/i\/chat(?:\/|$)/.test(tab.url))return;
       const session=await sessions.get(tabId,false),state=await repository.load(session.accountId);
-      await syncGroupReviews(session,state,adapter,checkpoint,reviewTabs.get(tabId)||[]);
+      await syncGroupReviews(session,state,adapter,checkpoint,reviewTabs.get(tabId)||[],{permissionGroup:new URL(tab.url).pathname.match(/^\/i\/chat\/(g\d{1,30})\/info\/?$/)?.[1]||null});
     }catch{}finally{pendingReviews.delete(tabId);}
   },-1).catch(()=>pendingReviews.delete(tabId));
 }
