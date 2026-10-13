@@ -50,7 +50,7 @@
       if(!rows.length)continue;
       if(!root.querySelector('[data-cm-roster-style]')){const sheet=document.createElement('style');sheet.dataset.cmRosterStyle='1';sheet.textContent=style;(root===document?document.head:root).append(sheet);}
       let bar=root.querySelector('.cm-roster-toolbar');if(!bar){bar=document.createElement('div');bar.className='cm-roster-toolbar';bar.setAttribute('aria-label','CircleMate 成员筛选');
-        for(const [value,label] of [['all','全部'],['unfollowed','未关注'],['unmatched','未回关'],['interacted','互动'],['unavailable','异常']]){const b=document.createElement('button');b.type='button';b.textContent=label;b.dataset.mode=value;b.onclick=()=>{mode=value;render();};bar.append(b);}
+        for(const [value,label] of [['all','全部'],['unfollowed','待关注'],['unmatched','未回关'],['interacted','互动'],['unavailable','异常']]){const b=document.createElement('button');b.type='button';b.textContent=label;b.dataset.mode=value;b.onclick=()=>{mode=value;render();};bar.append(b);}
         const blueLabel=document.createElement('label');blueLabel.className='cm-roster-blue';const blueCheck=document.createElement('input');blueCheck.type='checkbox';blueCheck.setAttribute('aria-label','蓝V');blueCheck.dataset.blue='1';blueCheck.onchange=()=>{blueOnly=blueCheck.checked;render();};blueLabel.append(blueCheck,document.createTextNode('蓝V'));bar.append(blueLabel);
         const next=document.createElement('button');next.type='button';next.textContent='识别下一批';next.dataset.enrich='1';next.onclick=()=>void enrich(true);bar.append(next);
         const sync=document.createElement('button');sync.type='button';sync.className='cm-roster-interaction-sync';sync.setAttribute('aria-label','同步互动');sync.dataset.interactions='1';
@@ -145,7 +145,7 @@
       const feedbackNode=bar.querySelector('.cm-roster-feedback');feedbackNode.hidden=!feedback||feedback.until<=Date.now();if(!feedbackNode.hidden){feedbackNode.textContent=feedback.text;feedbackNode.dataset.failed=String(feedback.failed);feedbackNode.setAttribute('role',feedback.failed?'alert':'status');}
       const waitingForCache=Boolean(state)&&!(state.relationships?.following?.cachedComplete||state.relationships?.following?.complete);
       const next=bar.querySelector('[data-enrich]');const automatic=!error&&(!state||enrichBusy||remaining>0);next.hidden=automatic||failed===0;next.disabled=enrichBusy||!groupId||group?.retryAt>Date.now();next.textContent='重试失败成员';
-      const note=bar.querySelector('.cm-roster-note'),text=error||(!state ? `正在读取缓存 · 已加载 ${rows.length} 人` : `已加载 ${rows.length-selfCount} 人 · ${blueOnly?'蓝V · ':''}${({all:'全部',unfollowed:'未关注',unmatched:'未回关',interacted:'互动',mutual:'互关',unavailable:'异常'})[mode]} ${matched} 人${unknown?(waitingForCache?' · 关注名单尚未完整（已缓存 '+(state.relationships?.following?.users?.length||0)+' 人）':' · '+unknown+' 人关系待确认'):''}${enrichBusy?' · 识别中':''}`);
+      const note=bar.querySelector('.cm-roster-note'),text=error||(!state ? `正在读取缓存 · 已加载 ${rows.length} 人` : `已加载 ${rows.length-selfCount} 人 · ${blueOnly?'蓝V · ':''}${({all:'全部',unfollowed:'待关注',unmatched:'未回关',interacted:'互动',mutual:'互关',unavailable:'异常'})[mode]} ${matched} 人${unknown?(waitingForCache?' · 关注名单尚未完整（已缓存 '+(state.relationships?.following?.users?.length||0)+' 人）':' · '+unknown+' 人关系待确认'):''}${enrichBusy?' · 识别中':''}`);
       note.dataset.loading=String(!(group?.retryAt>Date.now())&&!error&&(!state||enrichBusy||remaining>0));
       if(mode==='unavailable')bar.querySelector('.cm-roster-note').dataset.loading='false';
       const queued=followOrder.length;
